@@ -10,6 +10,7 @@ import json
 import os
 import time
 import PyQt6
+from numpy import long
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal as Signal
 from maya import OpenMayaUI as omui
