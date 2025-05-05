@@ -218,17 +218,7 @@ class LightingManager(QtWidgets.QWidget):
         scrollArea.setWidgetResizable(True)
         scrollArea.setWidget(scrollWidget)
         layout.addWidget(scrollArea, 1, 0, 1, 3)
-
-        # Button to save the current light setup
-        saveBtn = QtWidgets.QPushButton('Save')
-        saveBtn.clicked.connect(self.saveLights)
-        layout.addWidget(saveBtn, 2, 0)
-
-        # Button to import a saved light setup
-        importBtn = QtWidgets.QPushButton('Import')
-        importBtn.clicked.connect(self.importLights)
-        layout.addWidget(importBtn, 2, 1)
-       
+        
         # Button to refresh the list of lights from the scene
         refreshBtn = QtWidgets.QPushButton('Refresh')
         refreshBtn.clicked.connect(self.refresh)
