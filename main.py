@@ -6,53 +6,28 @@ Allows users to create, delete, modify (visibility, intensity, color),
 solo, save, and import light setups.
 """
 
-import json
-import os
-import time
-import PyQt6
-from numpy import long
-from PyQt6 import QtWidgets, QtCore, QtGui
-from PyQt6.QtCore import pyqtSignal as Signal
+from shiboken2 import wrapInstance
+from PySide2 import QtWidgets, QtCore, QtGui 
 from maya import OpenMayaUI as omui
 import pymel.core as pm
-import logging
 from functools import partial
-from sip import wrapinstance as wrapInstance
-
-
-# Configure logging for the tool
-logging.basicConfig()
-logger = logging.getLogger('LightingManager')
-logger.setLevel(logging.DEBUG)
-logger.debug('Using sip')
 
 
 # --- Light Widget ---
 class LightWidget(QtWidgets.QWidget):
     
-    onSolo = Signal(bool)
+    onSolo = QtCore.Signal(bool)
 
     def __init__(self, light):
         
-        super(LightWidget, self).__init__()
-
-        # Ensure 'light' is a PyNode object
-        # If it's a string, convert it to a PyNode
-        if isinstance(light,str):
-            logger.debug('Converting node to a PyNode')
-            light = pm.PyNode(light)
-            
-        if isinstance(light, pm.nodetypes.Transform):
-            light = light.getShape()
-
-        # Store the light shape node
+        super(LightWidget, self).__init__()   
         self.light = light
-        # Build the UI elements for this light widget
         self.buildUI()
 
 
 
     def buildUI(self):
+        
         """Creates the UI elements within the LightWidget."""
         layout = QtWidgets.QGridLayout(self)
 
@@ -103,21 +78,18 @@ class LightWidget(QtWidgets.QWidget):
         self.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
 
 
+    # Disables or enables the light's visibility checkbox.
     def disableLight(self, val):
-        # Disables or enables the light's visibility checkbox.
         self.name.setChecked(not bool(val))
 
 
     def deleteLight(self):
         """Deletes the light from the scene and removes the widget."""
-        # Remove the widget from its parent layout
+        
         self.setParent(None)
-        # Hide the widget
-        self.setVisible(False)
-        # Schedule the widget for deletion
-        self.deleteLater()
-        # Delete the corresponding light node (transform) in Maya
-        pm.delete(self.light.getTransform())
+        self.setVisible(False) # Hide the widget
+        self.deleteLater() # Schedule the widget for deletion
+        pm.delete(self.light.getTransform()) # Delete the corresponding light node (transform) in Maya
 
     def setColor(self):
         """Opens the Maya color editor to set the light's color."""
@@ -162,37 +134,16 @@ class LightingManager(QtWidgets.QWidget):
     }
 
     def __init__(self, dock=False):
-        # Determine the parent widget based on the dock flag
-        if dock:
-            parent = getDock()
-        else:
-            # If not docking, ensure any existing dock is deleted
-            deleteDock()
             
-            # Try to delete any existing standalone window with the same name
-            try:
-                pm.deleteUI('lightingManager')
-            except:
-                logger.debug('No previous UI exists')
-
-            parent = QtWidgets.QDialog(parent=getMayaMainWindow())
-            parent.setObjectName('lightingManager')
-            # Set window properties if it's a standalone dialog
-            parent.setWindowTitle('Lighting Manager')
-            dlgLayout = QtWidgets.QVBoxLayout(parent)
-
+        parent = None
+        
         # Initialize the QWidget part of this class
         super(LightingManager, self).__init__(parent=parent)
 
         # Build the main UI elements
         self.buildUI()
         self.populate()
-        self.parent().layout().addWidget(self)
-
-        # If not docked, show parent
-        if not dock:
-            parent.show()
-
+        
     def buildUI(self):
         """Creates the main UI elements for the Lighting Manager window."""
         layout = QtWidgets.QGridLayout(self)
@@ -250,7 +201,6 @@ class LightingManager(QtWidgets.QWidget):
         # If requested, add a widget for the new light to the UI
         if add:
             self.addLight(light)
-
         return light
 
     def addLight(self, light):
@@ -269,22 +219,16 @@ class LightingManager(QtWidgets.QWidget):
                 # Disable (uncheck) its visibility checkbox if soloing (val is True)
                 widget.disableLight(val)
 
+
 # --- Maya Integration Utilities ---
+ui = None
+
 def getMayaMainWindow():
-    win = omui.MQtUtil_mainWindow()
-    ptr = wrapInstance(long(win), QtWidgets.QMainWindow)
-    return ptr
+    global ui
+    ui = LightingManager()
+    ui.show()
+    return ui
 
 
-def getDock(name='LightingManagerDock'):
-
-    deleteDock(name)
-    ctrl = pm.workspaceControl(name, dockToMainWindow=('right', 1), label="Lighting Manager")
-    qtCtrl = omui.MQtUtil_findControl(ctrl)
-    ptr = wrapInstance(long(qtCtrl), QtWidgets.QWidget)
-    return ptr
-
-def deleteDock(name='LightingManagerDock'):
-
-    if pm.workspaceControl(name, query=True, exists=True):
-        pm.deleteUI(name)
+        
+getMayaMainWindow()
