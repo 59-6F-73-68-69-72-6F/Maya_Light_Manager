@@ -1,13 +1,14 @@
 """
 Lighting Manager Tool for Maya
 
-Provides a PyQt widget to manage lights within a Maya scene.
+Provides a PySide widget to manage lights within a Maya scene.
 Allows users to create, delete, modify (visibility, intensity, color),
-solo, save, and import light setups.
+solo.
 """
 
 from shiboken2 import wrapInstance
-from PySide2 import QtWidgets, QtCore, QtGui 
+from PySide2 import QtWidgets, QtCore
+from PySide2.QtCore import QSize
 from maya import OpenMayaUI as omui
 import pymel.core as pm
 from functools import partial
@@ -53,22 +54,19 @@ class LightWidget(QtWidgets.QWidget):
         # Delete button
         delete = QtWidgets.QPushButton('X')
         delete.clicked.connect(self.deleteLight)
-        delete.setMaximumWidth(10)
+        delete.setMaximumWidth(20)
         layout.addWidget(delete, 0, 2)
 
-        # Intensity slider
-        intensity = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-        intensity.setMinimum(1)
-        intensity.setMaximum(1000)
-        # Set initial slider value based on light's intensity
-        intensity.setValue(self.light.intensity.get())
-        # Connect the slider's valueChanged signal to the light's intensity attribute
-        intensity.valueChanged.connect(lambda val: self.light.intensity.set(val))
+        # Light Intensity
+        intensity = QtWidgets.QLineEdit(self, text=str(self.light.aiExposure.get()))
+        intensity.setMaximumWidth(110)
+        intensity.returnPressed.connect(lambda: self.light.aiExposure.set(float(intensity.text())))
+        
         layout.addWidget(intensity, 1, 0, 1, 2)
 
         # Color picker button
         self.colorBtn = QtWidgets.QPushButton()
-        self.colorBtn.setMaximumWidth(20)
+        self.colorBtn.setMaximumWidth(60)
         self.colorBtn.setMaximumHeight(20)
         self.setButtonColor()
         self.colorBtn.clicked.connect(self.setColor)
@@ -195,13 +193,20 @@ class LightingManager(QtWidgets.QWidget):
             self.addLight(light)
 
     def createLight(self, lightType=None, add=True):
-        func = self.lightTypes[lightType]
-        light = func()
+        actual_light_type_key = lightType
         
-        # If requested, add a widget for the new light to the UI
-        if add:
-            self.addLight(light)
-        return light
+        # # If lightType is not provided (e.g., when called by button click),
+        # # get the currently selected type from the ComboBox.
+        if actual_light_type_key is None or not isinstance(actual_light_type_key, str):
+            actual_light_type_key = self.lightTypeCB.currentText()
+
+        if actual_light_type_key not in self.lightTypes:
+            print(f"Error: Light type '{actual_light_type_key}' is invalid or not selected in the ComboBox.")
+            return None  # Or handle error more gracefully
+            
+        func = self.lightTypes[actual_light_type_key]
+        light = func()
+        self.refresh()
 
     def addLight(self, light):
         widget = LightWidget(light)
