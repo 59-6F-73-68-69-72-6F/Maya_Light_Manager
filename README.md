@@ -36,3 +36,7 @@ The tool automatically applies a consistent naming convention (e.g., LGT_KEY_000
   - Delete: Quickly remove selected lights from your scene with a confirmation prompt to prevent accidental deletions.
 
 The Maya Light Manager is built to simplify complex lighting tasks, providing artists with immediate control and clear oversight of their scene.
+
+
+![image](https://github.com/user-attachments/assets/1bce4b9f-1baf-404e-b553-5437f4fd4395)
+
