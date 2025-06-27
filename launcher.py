@@ -6,13 +6,13 @@ Enjoy !
 '''
 
 import sys
-import main
 from importlib import reload
 
 directory = r"YOUR_PATH\Maya_Light_Manager"
 if directory not in sys.path:
     sys.path.append(directory)
 
+import main
 reload(main)
 main.LightManager()
 print("Launched Maya Light Manager.")
