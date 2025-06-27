@@ -38,5 +38,6 @@ The tool automatically applies a consistent naming convention (e.g., LGT_KEY_000
 The Maya Light Manager is built to simplify complex lighting tasks, providing artists with immediate control and clear oversight of their scene.
 
 
-![image](https://github.com/user-attachments/assets/1bce4b9f-1baf-404e-b553-5437f4fd4395)
+![image](https://github.com/user-attachments/assets/6a74a0bd-688c-4175-bb45-86da8a6e5a69)
+
 
