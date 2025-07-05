@@ -20,22 +20,22 @@ from functools import partial
 from maya import cmds as m
 import mtoa.utils as ad
 
-FONT = "Nimbus Sans, Bold"
-FONT_SIZE = 11
-FONT_WEIGHT = 600
-COLOR = "#c7c7c5"
 TABLE_HEADER = ["Name","M","S","LightType","Color","Exposure","Samples"]
 HEADER_SIZE = [180,20,20,100,55,75,75]
+FONT = "Nimbus Sans, Bold"
+COLOR = "#c7c7c5"
+FONT_WEIGHT = 600
+FONT_SIZE = 11
 
 
 class LightManager(QWidget):
     lightTypes = {
-        "pointLight": m.pointLight,
-        "spotLight": m.spotLight,
+        "aiPhotometricLight":None,
+        "aiSkyDomeLight": None,
         "aiAreaLight": None,
         "directionalLight": m.directionalLight,
-        "aiSkyDomeLight": None,
-        "aiPhotometricLight":None,
+        "pointLight": m.pointLight,
+        "spotLight": m.spotLight,
         }
 
     def __init__(self):
@@ -46,9 +46,9 @@ class LightManager(QWidget):
     # SET WINDOW --------------------------------------------
     def buildUI(self):
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)  # KEEP WINDOW ON TOP
+        self.setWindowTitle("Maya Light Manager")
         self.setMinimumSize(600,800)
         self.setMaximumSize(600,1000)
-        self.setWindowTitle("Maya Light Manager")
         layoutV = QVBoxLayout(self)
         
         self.Qlabel = QLabel()
