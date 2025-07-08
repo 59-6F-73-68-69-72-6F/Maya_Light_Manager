@@ -1,5 +1,6 @@
 import maya.cmds as m
-import mtoa.utils as ad
+import mtoa.utils as au
+import mtoa.core as ac
 from functools import partial
 from PySide2.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QMessageBox
 from PySide2.QtCore import Qt
@@ -111,7 +112,7 @@ class MayaLightLogic():
         
         # ARNOLD LIGHT 
         if lightType_key in ["aiAreaLight", "aiSkyDomeLight","aiPhotometricLight"]:
-            light_nodes = ad.createLocator(lightType_key, asLight=True)
+            light_nodes = au.createLocator(lightType_key, asLight=True)
             light_transform = m.rename(light_nodes[1], naming_convention)
             
         # elif lightType_key == "aiMeshLight":
@@ -319,5 +320,7 @@ class MayaLightLogic():
                     self.ui.lightTable.hideRow(row)
                     
     def render(self):
-            m.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
-            m.render()
+        m.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
+        m.arnoldRenderView(mode="open")
+        
+            
