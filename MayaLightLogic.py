@@ -305,6 +305,19 @@ class MayaLightLogic():
         r, g, b = [c * 255 for c in color]
         color_button.setStyleSheet(f"background-color: rgba({r},{g},{b}, 1.0)")
         
-    def test(self):
-        print("test")
-        return "test"
+    def searchLight(self):
+        search_text = self.ui.entry_lighSearch.text().lower()
+        if not search_text:
+            self.refresh()
+            return
+        if search_text:
+            for row in range(self.ui.lightTable.rowCount()):
+                researsh_light = self.ui.lightTable.item(row, 0).text()
+                if search_text in researsh_light.lower():
+                    self.ui.lightTable.showRow(row)
+                else:
+                    self.ui.lightTable.hideRow(row)
+                    
+    def render(self):
+            m.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
+            m.render()

@@ -24,6 +24,7 @@ def getMayaMainWindow():
     ui.button_refresh.clicked.connect(logic.refresh)
     ui.button_delete.clicked.connect(logic.delete)
     ui.lightTable.itemSelectionChanged.connect(logic.lightTable_selection)
+    ui.entry_lighSearch.textChanged.connect(logic.searchLight)
     
     
 
