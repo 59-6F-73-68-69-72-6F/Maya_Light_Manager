@@ -5,6 +5,7 @@ import os
 
 logic = None
 ui = None
+
 def getMayaMainWindow():
     global ui
     global logic
@@ -25,7 +26,7 @@ def getMayaMainWindow():
     ui.button_delete.clicked.connect(logic.delete)
     ui.lightTable.itemSelectionChanged.connect(logic.lightTable_selection)
     ui.entry_lighSearch.textChanged.connect(logic.searchLight)
-    
+    ui.button_render.clicked.connect(logic.render)
     
 
     ui.show()

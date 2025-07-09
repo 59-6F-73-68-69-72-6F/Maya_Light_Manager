@@ -19,8 +19,8 @@ from PySide2.QtCore import Qt
 from maya import cmds as m
 
 
-TABLE_HEADER = ["Name","M","S","LightType","Color","Exposure","Samples"]
-HEADER_SIZE = [160,20,20,90,55,75,75]
+TABLE_HEADER = ["Name","M","S","LightType","Color","Exposure","Samples","AOV"]
+HEADER_SIZE = [160,20,20,90,55,75,75,60]
 FONT = "Nimbus Sans, Bold"
 COLOR = "#c7c7c5"
 FONT_WEIGHT = 600
@@ -40,7 +40,6 @@ class LightManagerUI(QWidget):
     def __init__(self):
         super().__init__()
         self.buildUI()
-        
 
     # SET WINDOW --------------------------------------------
     def buildUI(self):
@@ -55,6 +54,9 @@ class LightManagerUI(QWidget):
     
         title_lightName = self.label_text("Light Name:")
         self.entry_lightName = self.bar_text("name your light  (key,rim...etc")
+        
+        self.info_text = self.label_text("Light Manager initialized")
+        self.info_text.setFont(QFont(FONT,9))
         
         title_lighSearch = self.label_text("Search by name:")
         self.entry_lighSearch = self.bar_text("Type light name to search")
@@ -80,13 +82,12 @@ class LightManagerUI(QWidget):
         self.button_delete = self.push_button("Delete")
         self.button_delete.setStyleSheet(" background-color: #c1121f ; color: white;")
         
-        title_lightList = self.label_text("Light List:")
         
         self.lightTable = QTableWidget()
         self.lightTable.setSelectionMode(QAbstractItemView.SingleSelection) #SELECT ONLY ONE ROW AT A TIME
         self.lightTable.setEditTriggers(QAbstractItemView.NoEditTriggers) # MAKE CELLS NON-EDITABLE
         self.lightTable.setStyleSheet("QTableWidget { background-color: #222b33 ; color: white; }")
-        for y in range(7):
+        for y in range(8):
             self.lightTable.setColumnCount(y+1)
             self.lightTable.setHorizontalHeaderLabels(TABLE_HEADER)  # SET THE HEADER LABELS
             header = self.lightTable.horizontalHeader()
@@ -109,7 +110,6 @@ class LightManagerUI(QWidget):
         layoutV_01.addWidget(self.button_rename)
         layoutV_02.addWidget(title_lighSearch)
         layoutV_02.addWidget(self.entry_lighSearch)
-        layoutV_02.addWidget(title_lightList)
         layoutV_02.addWidget(self.lightTable)
         layoutV_02.addWidget(self.button_refresh)
         layoutV_02.addWidget(self.button_delete)
@@ -121,6 +121,7 @@ class LightManagerUI(QWidget):
         main_layout.addWidget(self.logo)
         main_layout.addWidget(group_box_01)
         main_layout.addWidget(group_box_02)
+        main_layout.addWidget(self.info_text)
         
         
         main_layout.setAlignment(Qt.AlignCenter)

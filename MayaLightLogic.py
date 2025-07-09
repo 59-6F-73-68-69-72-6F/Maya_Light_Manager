@@ -1,9 +1,10 @@
 import maya.cmds as m
 import mtoa.utils as au
 import mtoa.core as ac
+import mtoa.aovs as aovs
 from functools import partial
 from PySide2.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QMessageBox
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, QTimer
 
 
 
@@ -30,8 +31,9 @@ class MayaLightLogic():
                 m.rename(selection, "LGT_"+new_name+"_000") # RENAME WITH A NANING CONVENTION
                 self.ui.entry_lightName.clear()
                 self.refresh()
+                self.info_timer(f"Light: '{selection}' renamed to 'LGT_{new_name}_000'")
             except RuntimeError as e:
-                pass
+                self.info_timer(f"Error: {e}")
         
     def refresh(self):
         # KILL ALL EXISTING SCRIPTS JOB TO PREVENT ERRORS WITH DELETED WIDGETS
@@ -52,10 +54,12 @@ class MayaLightLogic():
                         self.light_name_to_list(lightshape, transform)
                         self.mute_solo_to_list(transform)
                         self.colorButton_to_list(transform)
-                        self.entry_to_list(transform,"aiExposure",5)
-                        self.entry_to_list(transform,"aiSamples",6)
+                        self.entry_attrNum_to_list(transform,"aiExposure",5)
+                        self.entry_attrNum_to_list(transform,"aiSamples",6)
+                        self.Entry_attrText_to_list(f"{lightshape}.aiAov",7)
+                        self.info_timer("Light Manager refreshed successfully.")
                     else:
-                        print(f"'{transform}' is not allowed by the manager - warning {node_type}")
+                        self.info_timer(f"'{transform}' is not allowed by the manager - warning {node_type}")
                         pass
         m.select(clear=True)
 
@@ -66,6 +70,7 @@ class MayaLightLogic():
         if btn_question == QMessageBox.Yes:
             m.delete(selection)
             self.refresh()
+            self.info_timer(f"Light '{selection[0]}' deleted successfully.")
         else:
             pass
 
@@ -81,7 +86,7 @@ class MayaLightLogic():
                     m.select(clear=True)
                     m.select(light_name)
                 except ValueError as e:
-                    print(f"Error: {e}")
+                    self.info_timer(f"Error: {e}")
         else:
             m.select(clear=True)
             
@@ -141,10 +146,12 @@ class MayaLightLogic():
         self.light_name_to_list(light_shape, light_transform)
         self.mute_solo_to_list(light_transform)
         self.colorButton_to_list(light_transform)
-        self.entry_to_list(light_transform,"aiExposure",5)
-        self.entry_to_list(light_transform,"aiSamples",6)
-        self.ui.entry_lightName.clear()
+        self.entry_attrNum_to_list(light_transform,"aiExposure",5)
+        self.entry_attrNum_to_list(light_transform,"aiSamples",6)
+        self.Entry_attrText_to_list(f"{light_shape}.aiAov",7)
         
+        self.ui.entry_lightName.clear()
+        self.info_timer(f"Light '{lightType_key}' created successfully.")
 
     def light_name_to_list(self, light_shape_name, light_transform_name):
         self.row_position = self.ui.lightTable.rowCount()
@@ -199,8 +206,8 @@ class MayaLightLogic():
         colorBtn_layout.setContentsMargins(0,0,0,0)
         self.ui.lightTable.setCellWidget(self.row_position, 4, colorBtn_widget)
     
-    # GENERATE AN EDITABLE SECTION FOR ATTRIBUTE
-    def entry_to_list(self, light_transform_name,attribute_name,column):
+    # GENERATE AN EDITABLE SECTION FOR ATTRIBUTE --> Float
+    def entry_attrNum_to_list(self, light_transform_name,attribute_name,column):
         full_attr_name = f"{light_transform_name}.{attribute_name}"
         current_value = m.getAttr(full_attr_name)
         bar_text = self.ui.bar_text(text=f"{current_value:.3f}")
@@ -213,7 +220,7 @@ class MayaLightLogic():
                 new_value = float(bar_text.text()) # GET VALUE FROM UI
                 m.setAttr(full_attr_name, new_value) # SET VALUE IN MAYA
             except (ValueError, RuntimeError) as e:
-                print(f"Invalid input : {e}")
+                self.info_timer(f"Invalid input : {e}")
                 # ON ERROR, Reset the text to the current value in MAYA
                 current_maya_val = m.getAttr(full_attr_name)
                 bar_text.setText(f"{current_maya_val:.3f}") # SETTING THE VALUE IN THE UI
@@ -227,6 +234,43 @@ class MayaLightLogic():
             try:
                 new_value = m.getAttr(full_attr_name) # GET VALUE FROM MAYA
                 bar_text.setText(f"{new_value:.3f}") # SETTING THE VALUE IN THE UI
+            finally:
+                bar_text.blockSignals(False) # RE-ESTABLISHE THE SIGNAL
+
+        # CREATE A SCRIPT JOB TO LISTEN FOR CHANGES AND STORE ID FOR CLEANUP
+        job_id = m.scriptJob(attributeChange=[full_attr_name, update_ui_from_maya])
+        self.script_jobs.append(job_id)
+        self.ui.lightTable.setCellWidget(self.row_position, column, bar_text)
+
+    # GENERATE AN EDITABLE SECTION FOR ATTRIBUTE --> String
+    def Entry_attrText_to_list(self, light_shape_name,column):
+        full_attr_name = f"{light_shape_name}"
+        current_value = m.getAttr(full_attr_name)
+        bar_text = self.ui.bar_text(text=current_value)
+        bar_text.setFixedSize(59, 29) 
+        bar_text.setAlignment(Qt.AlignCenter)
+        bar_text.setContentsMargins(0,0,0,0)
+        
+        def update_maya_from_ui():
+            try:
+                new_value = bar_text.text()
+                m.setAttr(full_attr_name, new_value, type='string')
+                self.info_timer(f"Set AOV group for {light_shape_name} to '{new_value}'")
+            except (ValueError, RuntimeError) as e:
+                self.info_timer(f"Invalid input : {e}")
+                # ON ERROR, Reset the text to the current value in MAYA
+                current_maya_val = m.getAttr(full_attr_name)
+                bar_text.setText(current_maya_val)
+
+        bar_text.returnPressed.connect(update_maya_from_ui)
+
+        def update_ui_from_maya(*args):
+            if not m.objExists(light_shape_name):
+                return 
+            bar_text.blockSignals(True) #  AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
+            try:
+                new_value = m.getAttr(full_attr_name)
+                bar_text.setText(new_value)
             finally:
                 bar_text.blockSignals(False) # RE-ESTABLISHE THE SIGNAL
 
@@ -295,17 +339,17 @@ class MayaLightLogic():
     # SET THE BUTTON COLOR
     def setButtonColor(self,light_name,color_button, color=None):
         if not isinstance(light_name, str) or not m.objExists(light_name):
-            print(f"Error: Light '{light_name}' does not exist or is invalid.")
+            self.info_timer(f"Error: Light '{light_name}' does not exist or is invalid.")
             return
 
         if not color: # IF NOT, GET COLOR FROM MAYA
             color = m.getAttr(light_name + ".color")[0]
         if not isinstance(color, tuple):
-            print(f"Error: Invalid color format for light '{light_name}': {color}")
+            self.info_timer( f"Error: Invalid color format for light '{light_name}': {color}")
             return
         r, g, b = [c * 255 for c in color]
         color_button.setStyleSheet(f"background-color: rgba({r},{g},{b}, 1.0)")
-        
+    
     def searchLight(self):
         search_text = self.ui.entry_lighSearch.text().lower()
         if not search_text:
@@ -323,4 +367,6 @@ class MayaLightLogic():
         m.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
         m.arnoldRenderView(mode="open")
         
-            
+    def info_timer(self,text, duration_ms=2500):
+        self.ui.info_text.setText(text)
+        QTimer.singleShot(duration_ms, lambda: self.ui.info_text.setText(""))
