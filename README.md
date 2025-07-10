@@ -28,5 +28,6 @@ The **Maya Light Manager**, provides a compact and efficient user interface that
 
 This application streamlines the entire lighting process by reducing clicks, centralizing controls, and providing workflow-enhancing features that allow lighting artists to work faster and more efficiently.
 
-![image](https://github.com/user-attachments/assets/a9ae3b21-6348-49c7-8c73-522360665bb5)
+![image](https://github.com/user-attachments/assets/f2f5bc38-d3e6-4f1e-bcae-a1209552c95d)
+
 
