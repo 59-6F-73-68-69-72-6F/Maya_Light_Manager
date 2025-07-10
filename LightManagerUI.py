@@ -50,7 +50,7 @@ class LightManagerUI(QWidget):
         self.logo.setAlignment(Qt.AlignCenter)
     
         title_lightName = self.label_text("Light Name:")
-        self.entry_lightName = self.bar_text("name your light  (key,rim...etc")
+        self.entry_lightName = self.bar_text("Name your light  (Key,Rim,...etc)")
         
         self.info_text = self.label_text("Light Manager initialized")
         self.info_text.setFont(QFont(FONT,9))
