@@ -1,4 +1,6 @@
-from PySide2.QtWidgets import QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,QVBoxLayout,QAbstractItemView,QGroupBox,QApplication
+from PySide2.QtWidgets import (QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,
+                               QVBoxLayout,QAbstractItemView,QGroupBox,QApplication)
+
 from PySide2.QtGui import QFont,QWheelEvent
 from PySide2.QtCore import Qt
 from maya import cmds as m

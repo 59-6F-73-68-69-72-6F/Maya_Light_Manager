@@ -45,7 +45,6 @@ def getMayaMainWindow():
     ui.entry_lighSearch.textChanged.connect(logic.searchLight)
     ui.button_render.clicked.connect(logic.render)
     
-
     ui.show()
     return ui
 getMayaMainWindow()

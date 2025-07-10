@@ -1,8 +1,9 @@
-import maya.cmds as m
-import mtoa.utils as au
-from functools import partial
 from PySide2.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QMessageBox
 from PySide2.QtCore import Qt, QTimer
+from functools import partial
+import mtoa.utils as au
+import maya.cmds as m
+
 from LightManagerUI import CustomLineEdit
 
 
@@ -209,7 +210,7 @@ class MayaLightLogic():
         full_attr_name = f"{light_transform_name}.{attribute_name}"
         current_value = m.getAttr(full_attr_name)
         bar_text = CustomLineEdit() # SETTING THE CURRENT VALUE IN THE UI
-        # bar_text.setText(f"{current_value:.3f}")
+        bar_text.setText(f"{current_value:.3f}")
         bar_text.setFixedSize(74, 29)
         bar_text.setAlignment(Qt.AlignCenter)
         bar_text.setContentsMargins(0,0,0,0)
@@ -222,7 +223,7 @@ class MayaLightLogic():
                 self.info_timer(f"Wrong input:  Please enter a number")
                 # ON ERROR, Reset the text to the current value in MAYA
                 current_maya_val = m.getAttr(full_attr_name)
-                bar_text.setText(f"{current_maya_val:.3f}") # SETTING THE VALUE IN THE UI
+                bar_text.setText(f"{current_maya_val:.3f}")
 
         bar_text.returnPressed.connect(update_maya_from_ui)
 
@@ -231,8 +232,8 @@ class MayaLightLogic():
                 return 
             bar_text.blockSignals(True) #  AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA TRY TO UPDATE EACH OTHER
             try:
-                new_value = m.getAttr(full_attr_name) # GET VALUE FROM MAYA
-                bar_text.setText(f"{new_value:.3f}") # SETTING THE VALUE IN THE UI
+                new_value = m.getAttr(full_attr_name)
+                bar_text.setText(f"{new_value:.3f}") 
             finally:
                 bar_text.blockSignals(False) # RE-ESTABLISHE THE SIGNAL
 
@@ -314,7 +315,7 @@ class MayaLightLogic():
                 continue
             
             light_name = light_name_item.text()
-            if not m.objExists(light_name):                      # CHECK IF LIGHT STILL EXISTS
+            if not m.objExists(light_name):               # CHECK IF LIGHT STILL EXISTS
                 continue
             
             mute_checkbox = mute_widget.findChild(QCheckBox)
