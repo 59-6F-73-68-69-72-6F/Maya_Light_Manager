@@ -29,9 +29,9 @@ class LightManagerUI(QWidget):
         "aiPhotometricLight":None,
         "aiSkyDomeLight": None,
         "aiAreaLight": None,
-        "directionalLight": m.directionalLight,
-        "pointLight": m.pointLight,
         "spotLight": m.spotLight,
+        "pointLight": m.pointLight,
+        "directionalLight": m.directionalLight,
         }
 
     def __init__(self):
@@ -44,7 +44,6 @@ class LightManagerUI(QWidget):
         self.setWindowTitle("Maya Light Manager")
         self.setMinimumSize(620,670)
         self.setMaximumSize(620,1000)
-        
         
         self.logo = QLabel()
         self.logo.setAlignment(Qt.AlignCenter)
@@ -79,24 +78,22 @@ class LightManagerUI(QWidget):
         self.button_delete = self.push_button("Delete")
         self.button_delete.setStyleSheet(" background-color: #c1121f ; color: white;")
         
-        
         self.lightTable = QTableWidget()
         self.lightTable.setSelectionMode(QAbstractItemView.SingleSelection) #SELECT ONLY ONE ROW AT A TIME
         self.lightTable.setEditTriggers(QAbstractItemView.NoEditTriggers) # MAKE CELLS NON-EDITABLE
         self.lightTable.setStyleSheet("QTableWidget { background-color: #222b33 ; color: white; }")
-        for y in range(8):
+        for y in range(len(TABLE_HEADER)):
             self.lightTable.setColumnCount(y+1)
             self.lightTable.setHorizontalHeaderLabels(TABLE_HEADER)  # SET THE HEADER LABELS
             header = self.lightTable.horizontalHeader()
             header.resizeSection(y,HEADER_SIZE[y])
         
         group_box_01 = QGroupBox()
-        group_box_01.setStyleSheet("QGroupBox { border: 1px solid grey; border-radius: 3px; padding: 20px; padding-top: 1px;padding-bottom: 2px;}")
         group_box_02 = QGroupBox()
+        group_box_01.setStyleSheet("QGroupBox { border: 1px solid grey; border-radius: 3px; padding: 20px; padding-top: 1px;padding-bottom: 2px;}")
         group_box_02.setStyleSheet("QGroupBox { border: 1px solid grey; border-radius: 3px; padding: 3px;}")
         layoutV_01   = QVBoxLayout()
         layoutV_02   = QVBoxLayout()
-        layoutV_03   = QVBoxLayout()
         
         layoutV_01.addWidget(self.button_render)
         layoutV_01.addWidget(title_lightName)
@@ -119,7 +116,6 @@ class LightManagerUI(QWidget):
         main_layout.addWidget(group_box_01)
         main_layout.addWidget(group_box_02)
         main_layout.addWidget(self.info_text)
-        
         
         main_layout.setAlignment(Qt.AlignCenter)
         self.setLayout(main_layout)

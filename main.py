@@ -33,8 +33,7 @@ logic = None
 ui = None
 
 def getMayaMainWindow():
-    global ui
-    global logic
+    global ui,logic
     
     ui = lmui.LightManagerUI()
     logic = mll.MayaLightLogic(ui)

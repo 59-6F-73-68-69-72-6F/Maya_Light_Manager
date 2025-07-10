@@ -26,9 +26,9 @@ class MayaLightLogic():
             "aiPhotometricLight": None,
             "aiSkyDomeLight": None,
             "aiAreaLight": None,
-            "directionalLight": m.directionalLight,
-            "pointLight": m.pointLight,
             "spotLight": m.spotLight,
+            "pointLight": m.pointLight,
+            "directionalLight": m.directionalLight,
             }
 
 
@@ -37,7 +37,7 @@ class MayaLightLogic():
             selection = m.ls(selection=True)[0]
             try:
                 new_name = self.ui.entry_lightName.text()
-                m.rename(selection, "LGT_"+new_name+"_000") # RENAME WITH A NANING CONVENTION
+                m.rename(selection, "LGT_"+new_name+"_000")          # RENAME WITH A NANING CONVENTION
                 self.ui.entry_lightName.clear()
                 self.refresh()
                 self.info_timer(f"Light: '{selection}' renamed to 'LGT_{new_name}_000'")
@@ -155,8 +155,8 @@ class MayaLightLogic():
         self.light_name_to_list(light_shape, light_transform)
         self.mute_solo_to_list(light_transform)
         self.colorButton_to_list(light_transform)
-        self.entry_attrNum_to_list(light_transform,"aiExposure",5)
         self.entry_attrNum_to_list(light_transform,"aiSamples",6)
+        self.entry_attrNum_to_list(light_transform,"aiExposure",5)
         self.Entry_attrText_to_list(f"{light_shape}.aiAov",7)
         
         self.ui.entry_lightName.clear()
@@ -172,7 +172,7 @@ class MayaLightLogic():
         self.ui.lightTable.setItem(self.row_position, 0, name_item)
 
         # POPULATE THE "Light Type" COLUMN
-        light_type = m.nodeType(light_shape_name) # EXTRACT LIGHT TYPE FROM THE SHAPE NODE
+        light_type = m.nodeType(light_shape_name)               # EXTRACT LIGHT TYPE FROM THE SHAPE NODE
         type_item = QTableWidgetItem(light_type)
         type_item.setTextAlignment(Qt.AlignCenter)
         self.ui.lightTable.setItem(self.row_position, 3, type_item)
@@ -219,7 +219,7 @@ class MayaLightLogic():
     def entry_attrNum_to_list(self, light_transform_name,attribute_name,column):
         full_attr_name = f"{light_transform_name}.{attribute_name}"
         current_value = m.getAttr(full_attr_name)
-        bar_text = CustomLineEdit() # SETTING THE CURRENT VALUE IN THE UI
+        bar_text = CustomLineEdit()                             # SETTING THE CURRENT VALUE IN THE UI
         bar_text.setText(f"{current_value:.3f}")
         bar_text.setFixedSize(74, 29)
         bar_text.setAlignment(Qt.AlignCenter)
@@ -227,8 +227,8 @@ class MayaLightLogic():
         
         def update_maya_from_ui():
             try:
-                new_value = float(bar_text.text()) # GET VALUE FROM UI
-                m.setAttr(full_attr_name, new_value) # SET VALUE IN MAYA
+                new_value = float(bar_text.text())               # GET VALUE FROM UI
+                m.setAttr(full_attr_name, new_value)             # SET VALUE IN MAYA
             except (ValueError, RuntimeError) as e:
                 self.info_timer(f"Wrong input:  Please enter a number")
                 # ON ERROR, Reset the text to the current value in MAYA
@@ -240,12 +240,12 @@ class MayaLightLogic():
         def update_ui_from_maya(*args):
             if not m.objExists(light_transform_name):
                 return 
-            bar_text.blockSignals(True) #  AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA TRY TO UPDATE EACH OTHER
+            bar_text.blockSignals(True)                       # AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA TRY TO UPDATE EACH OTHER
             try:
                 new_value = m.getAttr(full_attr_name)
                 bar_text.setText(f"{new_value:.3f}") 
             finally:
-                bar_text.blockSignals(False) # RE-ESTABLISHE THE SIGNAL
+                bar_text.blockSignals(False)                 # RE-ESTABLISHE THE SIGNAL
 
         # CREATE A SCRIPT JOB TO LISTEN FOR CHANGES AND STORE ID FOR CLEANUP
         job_id = m.scriptJob(attributeChange=[full_attr_name, update_ui_from_maya])
