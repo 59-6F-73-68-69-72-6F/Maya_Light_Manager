@@ -1,10 +1,20 @@
-from PySide2.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QMessageBox
-from PySide2.QtCore import Qt, QTimer
-from functools import partial
-import mtoa.utils as au
+# VERSION CHECK
+# This code is designed to work with Maya versions 2024 and earlier.
+
 import maya.cmds as m
 
+maya_version = m.about(version=True)
+if int(maya_version) <= 2024:
+    from PySide2.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QMessageBox
+    from PySide2.QtCore import Qt, QTimer
+else:
+    from PySide6.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QMessageBox
+    from PySide6.QtCore import Qt, QTimer
+
 from LightManagerUI import CustomLineEdit
+from functools import partial
+import mtoa.utils as au
+
 
 
 class MayaLightLogic():

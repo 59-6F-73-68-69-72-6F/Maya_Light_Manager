@@ -15,7 +15,14 @@
 # . CLEAR AND EASY SAMPLES MANAGMENT
 ######################################################
 
-from PySide2.QtGui import QPixmap
+import maya.cmds as m
+maya_version = m.about(version=True)
+
+if int(maya_version) <= 2024:
+    from PySide2.QtGui import QPixmap
+else:
+    from PySide6.QtGui import QPixmap
+    
 import LightManagerUI as lmui
 import MayaLightLogic as mll
 import os
