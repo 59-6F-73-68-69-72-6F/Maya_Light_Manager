@@ -1,4 +1,4 @@
-<h1 style="color: #5DADE2;">Maya Light Manager</h1> 
+<h1 style="color: #5DADE2;">Maya Light Manager 🔦</h1>
 
 <blockquote style="color:rgb(85, 88, 91);">A custom tool for Autodesk Maya to significantly speed up the lighting workflow, particularly for artists using the Arnold renderer.</blockquote>
 
