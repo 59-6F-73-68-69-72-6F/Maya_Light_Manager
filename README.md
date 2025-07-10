@@ -24,10 +24,15 @@ The **Maya Light Manager**, provides a compact and efficient user interface that
 
 *   **Real-time Sync**: The tool stays synchronized with the Maya scene. Any changes made to light attributes in the Attribute Editor are reflected back in the Light Manager's UI.
 
+<h2 style="color: #48C9B0;">Compatibility</h2>
+
+*   **Autodesk Maya**: The tool is designed for use with Autodesk Maya.
+*   **Arnold Renderer**: It is specifically optimized for workflows using the Arnold renderer and supports Arnold-specific lights.
+*   **Standard Lights**: It also maintains compatibility with standard Maya lights, making it versatile for various rendering setups.
+*   **Versions**: It is compatible with recent versions of Maya that include the Arnold plugin.
+
 <h2 style="color: #48C9B0;">Why Use the Light Manager?</h2>
 
 This application streamlines the entire lighting process by reducing clicks, centralizing controls, and providing workflow-enhancing features that allow lighting artists to work faster and more efficiently.
 
 ![image](https://github.com/user-attachments/assets/f2f5bc38-d3e6-4f1e-bcae-a1209552c95d)
-
-
