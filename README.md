@@ -13,7 +13,7 @@ The **Maya Light Manager**, provides a compact and efficient user interface that
 *   **Direct Attribute Control**: Modify essential light attributes directly from the list without selecting the light in Maya:
     *   **Mute/Solo**: Toggle lights on/off with the 'M' (Mute) checkbox or isolate a single light with the 'S' (Solo) checkbox to see its individual contribution.
     *   **Color**: A color swatch allows you to open the Maya color picker and change a light's color instantly.
-    *   **Exposure, Samples, & AOV**: Edit numeric fields for Exposure and Samples directly. You can even use the mouse wheel (with Ctrl/Shift) to increment/decrement values. The light's AOV (Arbitrary Output Variable) can also be set.
+    *   **Exposure, Samples, & AOV Light Grp**: Edit numeric fields for Exposure and Samples directly. You can even use the mouse wheel (with Ctrl/Shift) to increment/decrement values. The light's AOV Grp (Arbitrary Output Variable) can also be set.
 
 *   **Efficient Scene Management**:
     *   **Rename & Delete**: Select a light in the UI to rename or delete it from the scene (with a confirmation prompt for deletion).
