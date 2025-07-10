@@ -1,4 +1,4 @@
-<h1 style="color: #5DADE2;">Maya Light Manager</h1> 
+<h1 style="color: #5DADE2;">Maya Light Manager 🔦</h1>
 
 <blockquote style="color:rgb(85, 88, 91);">A custom tool for Autodesk Maya to significantly speed up the lighting workflow, particularly for artists using the Arnold renderer.</blockquote>
 
@@ -27,3 +27,7 @@ The **Maya Light Manager**, provides a compact and efficient user interface that
 <h2 style="color: #48C9B0;">Why Use the Light Manager?</h2>
 
 This application streamlines the entire lighting process by reducing clicks, centralizing controls, and providing workflow-enhancing features that allow lighting artists to work faster and more efficiently.
+
+![image](https://github.com/user-attachments/assets/f2f5bc38-d3e6-4f1e-bcae-a1209552c95d)
+
+
