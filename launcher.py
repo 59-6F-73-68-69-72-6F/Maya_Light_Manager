@@ -14,5 +14,5 @@ if directory not in sys.path:
 
 import main
 reload(main)
-main.LightManager()
+main
 print("Launched Maya Light Manager.")
