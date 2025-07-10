@@ -1,11 +1,9 @@
 import maya.cmds as m
 import mtoa.utils as au
-import mtoa.core as ac
-import mtoa.aovs as aovs
 from functools import partial
 from PySide2.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QMessageBox
 from PySide2.QtCore import Qt, QTimer
-
+from LightManagerUI import CustomLineEdit
 
 
 class MayaLightLogic():
@@ -33,7 +31,7 @@ class MayaLightLogic():
                 self.refresh()
                 self.info_timer(f"Light: '{selection}' renamed to 'LGT_{new_name}_000'")
             except RuntimeError as e:
-                self.info_timer(f"Error: {e}")
+                self.info_timer(f"Error: Wrong input - {e}")
         
     def refresh(self):
         # KILL ALL EXISTING SCRIPTS JOB TO PREVENT ERRORS WITH DELETED WIDGETS
@@ -70,7 +68,7 @@ class MayaLightLogic():
         if btn_question == QMessageBox.Yes:
             m.delete(selection)
             self.refresh()
-            self.info_timer(f"Light '{selection[0]}' deleted successfully.")
+            self.info_timer(f"Light  '{selection[0]}' deleted successfully.")
         else:
             pass
 
@@ -86,7 +84,7 @@ class MayaLightLogic():
                     m.select(clear=True)
                     m.select(light_name)
                 except ValueError as e:
-                    self.info_timer(f"Error: {e}")
+                    self.info_timer(f"Error:  '{light_name}' None Existent")
         else:
             m.select(clear=True)
             
@@ -210,7 +208,8 @@ class MayaLightLogic():
     def entry_attrNum_to_list(self, light_transform_name,attribute_name,column):
         full_attr_name = f"{light_transform_name}.{attribute_name}"
         current_value = m.getAttr(full_attr_name)
-        bar_text = self.ui.bar_text(text=f"{current_value:.3f}")
+        bar_text = CustomLineEdit() # SETTING THE CURRENT VALUE IN THE UI
+        # bar_text.setText(f"{current_value:.3f}")
         bar_text.setFixedSize(74, 29)
         bar_text.setAlignment(Qt.AlignCenter)
         bar_text.setContentsMargins(0,0,0,0)
@@ -220,7 +219,7 @@ class MayaLightLogic():
                 new_value = float(bar_text.text()) # GET VALUE FROM UI
                 m.setAttr(full_attr_name, new_value) # SET VALUE IN MAYA
             except (ValueError, RuntimeError) as e:
-                self.info_timer(f"Invalid input : {e}")
+                self.info_timer(f"Wrong input:  Please enter a number")
                 # ON ERROR, Reset the text to the current value in MAYA
                 current_maya_val = m.getAttr(full_attr_name)
                 bar_text.setText(f"{current_maya_val:.3f}") # SETTING THE VALUE IN THE UI
@@ -255,7 +254,7 @@ class MayaLightLogic():
             try:
                 new_value = bar_text.text()
                 m.setAttr(full_attr_name, new_value, type='string')
-                self.info_timer(f"Set AOV group for {light_shape_name} to '{new_value}'")
+                self.info_timer(f"{light_shape_name} set to AOV: '{new_value}'")
             except (ValueError, RuntimeError) as e:
                 self.info_timer(f"Invalid input : {e}")
                 # ON ERROR, Reset the text to the current value in MAYA
@@ -267,12 +266,12 @@ class MayaLightLogic():
         def update_ui_from_maya(*args):
             if not m.objExists(light_shape_name):
                 return 
-            bar_text.blockSignals(True) #  AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
+            bar_text.blockSignals(True)                     #  AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
             try:
                 new_value = m.getAttr(full_attr_name)
                 bar_text.setText(new_value)
             finally:
-                bar_text.blockSignals(False) # RE-ESTABLISHE THE SIGNAL
+                bar_text.blockSignals(False)                # RE-ESTABLISHE THE SIGNALE
 
         # CREATE A SCRIPT JOB TO LISTEN FOR CHANGES AND STORE ID FOR CLEANUP
         job_id = m.scriptJob(attributeChange=[full_attr_name, update_ui_from_maya])
@@ -282,14 +281,14 @@ class MayaLightLogic():
     def on_solo_toggled(self, toggled_row, state):
         """Ensures only one solo checkbox is active at a time and updates the scene."""
         if state:
-            for i in range(self.ui.lightTable.rowCount()): # SKIP the ROW OF THE CHECKBOX THAT WAS JUST TOGGLED
+            for i in range(self.ui.lightTable.rowCount()):                  # SKIP the ROW OF THE CHECKBOX THAT WAS JUST TOGGLED
                 if i != toggled_row:
                     solo_widget = self.ui.lightTable.cellWidget(i, 2)
                     if solo_widget:
-                        solo_checkbox = solo_widget.findChild(QCheckBox)  # RETRIEVE THE CUSTOM WIDGET IN THE  'Solo' COLUMN
-                        if solo_checkbox and solo_checkbox.isChecked(): # PREVENT RECURSIVE CALLS OF THIS FUNCTION
+                        solo_checkbox = solo_widget.findChild(QCheckBox)    # RETRIEVE THE CUSTOM WIDGET IN THE  'Solo' COLUMN
+                        if solo_checkbox and solo_checkbox.isChecked():     # PREVENT RECURSIVE CALLS OF THIS FUNCTION
                             solo_checkbox.blockSignals(True)
-                            solo_checkbox.setChecked(False) # UNCHECKED THE PREVIOUS SOLOED CHECKBOX
+                            solo_checkbox.setChecked(False)                 # UNCHECKED THE PREVIOUS SOLOED CHECKBOX
                             solo_checkbox.blockSignals(False)
         self.update_all_lights_visibility()
 
@@ -303,7 +302,7 @@ class MayaLightLogic():
             if solo_widget:
                 solo_checkbox = solo_widget.findChild(QCheckBox)
                 if solo_checkbox and solo_checkbox.isChecked():
-                    soloed_row = i  # IF A SOLO CHECKBOX IS FOUND AND CHECKED, STORE ITS ROW INDEX
+                    soloed_row = i                        # IF A SOLO CHECKBOX IS FOUND AND CHECKED, STORE ITS ROW INDEX
                     break
 
         # ITERATE THROUGH ALL LIGHTS TO SET THEIR VISIBILITY
@@ -315,7 +314,7 @@ class MayaLightLogic():
                 continue
             
             light_name = light_name_item.text()
-            if not m.objExists(light_name): # CHECK IF LIGHT STILL EXISTS
+            if not m.objExists(light_name):                      # CHECK IF LIGHT STILL EXISTS
                 continue
             
             mute_checkbox = mute_widget.findChild(QCheckBox)
@@ -330,22 +329,22 @@ class MayaLightLogic():
             print(f"Error: Light '{light_name}' does not exist or is invalid.")
             return
         
-        lightColor = m.getAttr(light_name + ".color")[0] #  GET THE ACTUAL LIGHT COLOR 
-        color = m.colorEditor(rgbValue=lightColor) # OPEN MAYA COLOR EDITOR AND PUT THE VALUE IN IT -(PICK A COLOR)
-        r, g, b, a = [float(c) for c in color.split()] #  RGB in string values -  RETRIEVE THE COLOR IN RGB VALUE
+        lightColor = m.getAttr(light_name + ".color")[0]        #  GET THE ACTUAL LIGHT COLOR 
+        color = m.colorEditor(rgbValue=lightColor)              # OPEN MAYA COLOR EDITOR AND PUT THE VALUE IN IT -(PICK A COLOR)
+        r, g, b, a = [float(c) for c in color.split()]          #  RGB in string values -  RETRIEVE THE COLOR IN RGB VALUE
         m.setAttr(light_name + ".color", r, g, b, type="double3") # SET THE COLOR IN MAYA
         self.setButtonColor(light_name,color_button,(r, g, b))
     
     # SET THE BUTTON COLOR
     def setButtonColor(self,light_name,color_button, color=None):
         if not isinstance(light_name, str) or not m.objExists(light_name):
-            self.info_timer(f"Error: Light '{light_name}' does not exist or is invalid.")
+            self.info_timer(f"Error:  '{light_name}' does not exist or is invalid.")
             return
 
         if not color: # IF NOT, GET COLOR FROM MAYA
             color = m.getAttr(light_name + ".color")[0]
         if not isinstance(color, tuple):
-            self.info_timer( f"Error: Invalid color format for light '{light_name}': {color}")
+            self.info_timer( f"Error:  Invalid color format for '{light_name}': {color}")
             return
         r, g, b = [c * 255 for c in color]
         color_button.setStyleSheet(f"background-color: rgba({r},{g},{b}, 1.0)")
@@ -367,6 +366,7 @@ class MayaLightLogic():
         m.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
         m.arnoldRenderView(mode="open")
         
-    def info_timer(self,text, duration_ms=2500):
+    def info_timer(self,text, duration_ms=3000):
         self.ui.info_text.setText(text)
         QTimer.singleShot(duration_ms, lambda: self.ui.info_text.setText(""))
+        

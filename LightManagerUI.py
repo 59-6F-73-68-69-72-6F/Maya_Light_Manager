@@ -1,20 +1,5 @@
-######################################################
-# - MAYA LIGHT MANAGER -
-# AUTHOR : RUDY LETI
-# DATE : 06/26/2025
-# DESIGNED TO SPEED UP LIGHTING PRODUCTION PROCESS
-#
-# .LIST THE MOST COMMON LIGHTS USED IN PRODUCTION (ARNOLD ORIENTED) IN THE SCENE ( CREATE,GATHER , RENAME AND DELETE LIGHTS)
-# . NAMING CONVENTION INTEGRATED
-# . LIGHTS SELECTABLE FROM THE UI
-# . ALLOW TO MUTE OR SOLO LIGHTS
-# . ALLOW QUICK MODIFICATION OF LIGHT COLOR,EXPOSURE
-# . FILTERS LIGHTS BY TYPE (MAYA LIGHT, ARNOLD)
-# . CLEAR AND EASY SAMPLES MANAGMENT
-######################################################
-
-from PySide2.QtWidgets import QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,QVBoxLayout,QAbstractItemView, QGroupBox
-from PySide2.QtGui import QFont
+from PySide2.QtWidgets import QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,QVBoxLayout,QAbstractItemView,QGroupBox,QApplication
+from PySide2.QtGui import QFont,QWheelEvent
 from PySide2.QtCore import Qt
 from maya import cmds as m
 
@@ -150,3 +135,26 @@ class LightManagerUI(QWidget):
         button = QPushButton(text)
         button.setFont(QFont(FONT,FONT_SIZE))
         return button
+
+class CustomLineEdit(QLineEdit):
+        def __init__(self, parent=None):
+            super().__init__(parent)
+            self.setText("0.000") 
+
+        def wheelEvent(self, event: QWheelEvent):
+            modifiers = QApplication.keyboardModifiers()
+            if modifiers == Qt.ControlModifier:
+                step = 0.01
+            elif modifiers ==   Qt.ShiftModifier:
+                step = 0.001
+            else:
+                super().wheelEvent(event)
+                return
+            
+            try:
+                current_value = float(self.text())
+                delta = event.angleDelta().y() / 120  
+                new_value = current_value + delta * step
+                self.setText(f"{new_value:.3f}")
+            except ValueError:
+                pass
