@@ -46,12 +46,12 @@ def getMayaMainWindow():
     ui.logo.setPixmap(img)
     
     # SET SIGNALS
+    ui.lightTable.itemSelectionChanged.connect(logic.lightTable_selection)
+    ui.entry_lighSearch.textChanged.connect(logic.searchLight)
     ui.button_createlight.clicked.connect(logic.create_light)
     ui.button_rename.clicked.connect(logic.rename_light)
     ui.button_refresh.clicked.connect(logic.refresh)
     ui.button_delete.clicked.connect(logic.delete)
-    ui.lightTable.itemSelectionChanged.connect(logic.lightTable_selection)
-    ui.entry_lighSearch.textChanged.connect(logic.searchLight)
     ui.button_render.clicked.connect(logic.render)
     
     ui.show()
