@@ -5,15 +5,15 @@ from maya import cmds as m
 
 maya_version = m.about(version=True)
 if int(maya_version) <= 2024:
+    from PySide2.QtCore import Qt
+    from PySide2.QtGui import QFont,QWheelEvent
     from PySide2.QtWidgets import (QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,
                                QVBoxLayout,QAbstractItemView,QGroupBox,QApplication)
-    from PySide2.QtGui import QFont,QWheelEvent
-    from PySide2.QtCore import Qt
 else:
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QFont,QWheelEvent
     from PySide6.QtWidgets import (QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,
                                QVBoxLayout,QAbstractItemView,QGroupBox,QApplication)
-    from PySide6.QtGui import QFont,QWheelEvent
-    from PySide6.QtCore import Qt
 
 
 TABLE_HEADER = ["Name","M","S","LightType","Color","Exposure","Samples","AOV"]
