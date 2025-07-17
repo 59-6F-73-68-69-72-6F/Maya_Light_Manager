@@ -53,6 +53,8 @@ def getMayaMainWindow():
     ui.button_delete.clicked.connect(logic.delete)
     ui.button_render.clicked.connect(logic.render)
     
+    logic.refresh()  # INITIAL REFRESH TO LOAD LIGHTS
+    
     ui.show()
     return ui
 getMayaMainWindow()
