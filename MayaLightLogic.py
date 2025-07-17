@@ -220,20 +220,27 @@ class MayaLightLogic():
         full_attr_name = f"{light_transform_name}.{attribute_name}"
         current_value = m.getAttr(full_attr_name)
         bar_text = CustomLineEdit()                             # SETTING THE CURRENT VALUE IN THE UI
-        bar_text.setText(f"{current_value:.3f}")
+        if isinstance(current_value, (float)):
+            bar_text.setText(f"{current_value:.3f}")
+        elif isinstance(current_value, (int)):
+            bar_text.setText(f"{current_value}")
         bar_text.setFixedSize(74, 29)
         bar_text.setAlignment(Qt.AlignCenter)
         bar_text.setContentsMargins(0,0,0,0)
         
         def update_maya_from_ui():
             try:
-                new_value = float(bar_text.text())               # GET VALUE FROM UI
+                new_value = float(bar_text.text())             # GET VALUE FROM UI
                 m.setAttr(full_attr_name, new_value)             # SET VALUE IN MAYA
             except (ValueError, RuntimeError) as e:
                 self.info_timer(f"Wrong input:  Please enter a number")
                 # ON ERROR, Reset the text to the current value in MAYA
                 current_maya_val = m.getAttr(full_attr_name)
-                bar_text.setText(f"{current_maya_val:.3f}")
+                if isinstance(current_maya_val, (float)):
+                    bar_text.setText(f"{current_maya_val:.3f}")
+                elif isinstance(current_maya_val, (int)):
+                    bar_text.setText(f"{current_maya_val}")
+
 
         bar_text.returnPressed.connect(update_maya_from_ui)
 
@@ -243,7 +250,10 @@ class MayaLightLogic():
             bar_text.blockSignals(True)                       # AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA TRY TO UPDATE EACH OTHER
             try:
                 new_value = m.getAttr(full_attr_name)
-                bar_text.setText(f"{new_value:.3f}") 
+                if isinstance(new_value, (float)):
+                    bar_text.setText(f"{new_value:.3f}") 
+                elif isinstance(new_value, (int)):
+                    bar_text.setText(f"{new_value}")
             finally:
                 bar_text.blockSignals(False)                 # RE-ESTABLISHE THE SIGNAL
 
