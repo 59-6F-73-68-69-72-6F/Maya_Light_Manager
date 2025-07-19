@@ -5,15 +5,15 @@ from maya import cmds as m
 
 maya_version = m.about(version=True)
 if int(maya_version) <= 2024:
-    from PySide2.QtCore import Qt
+    from PySide2.QtCore import Qt, QSize
     from PySide2.QtGui import QFont,QWheelEvent
     from PySide2.QtWidgets import (QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,
-                               QVBoxLayout,QAbstractItemView,QGroupBox,QApplication)
+                               QVBoxLayout,QHBoxLayout,QAbstractItemView,QGroupBox,QApplication)
 else:
-    from PySide6.QtCore import Qt
+    from PySide6.QtCore import Qt, QSize
     from PySide6.QtGui import QFont,QWheelEvent
     from PySide6.QtWidgets import (QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,
-                               QVBoxLayout,QAbstractItemView,QGroupBox,QApplication)
+                               QVBoxLayout,QHBoxLayout,QAbstractItemView,QGroupBox,QApplication)
 
 
 TABLE_HEADER = ["Name","M","S","LightType","Color","Exposure","Samples","AOV"]
@@ -42,20 +42,19 @@ class LightManagerUI(QWidget):
     def buildUI(self):
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)  # KEEP WINDOW ON TOP
         self.setWindowTitle("Maya Light Manager")
-        self.setMinimumSize(620,670)
+        self.setMinimumSize(620,690)
         self.setMaximumSize(620,1000)
         
         self.logo = QLabel()
         self.logo.setAlignment(Qt.AlignCenter)
     
         title_lightName = self.label_text("Light Name:")
-        self.entry_lightName = self.bar_text("Name your light  (Key,Rim,...etc)")
-        
+        self.entry_lightName = self.bar_text("Name your light", 160)
         self.info_text = self.label_text("Light Manager initialized")
         self.info_text.setFont(QFont(FONT,9))
         
         title_lighSearch = self.label_text("Search by name:")
-        self.entry_lighSearch = self.bar_text("Type light name to search")
+        self.entry_lighSearch = self.bar_text("Type light name to search",570)
         
         title_lightType = self.label_text("Light Type:")
         self.combo_lightType = self.combo_list(self.lightTypes) # COMBO BOX DRIVEN BY DICT
@@ -68,7 +67,7 @@ class LightManagerUI(QWidget):
         
         self.button_render = self.push_button(" Render ")
         self.button_render.setFixedSize(70, 30)
-        self.button_render.setContentsMargins(0, 0, 0, 0)  # REMOVE MARGINS
+        self.button_render.setContentsMargins(0, 0, 0, 0)
         self.button_render.setLayoutDirection(Qt.RightToLeft)  # SET THE BUTTON TO POINT RIGHT
         self.button_render.setStyleSheet(" background-color: #FFC107 ; color: black;")
         
@@ -79,7 +78,7 @@ class LightManagerUI(QWidget):
         self.button_delete.setStyleSheet(" background-color: #c1121f ; color: white;")
         
         self.lightTable = QTableWidget()
-        self.lightTable.setSelectionMode(QAbstractItemView.SingleSelection) #SELECT ONLY ONE ROW AT A TIME
+        self.lightTable.setSelectionMode(QAbstractItemView.SingleSelection) # SELECT ONLY ONE ROW AT A TIME
         self.lightTable.setEditTriggers(QAbstractItemView.NoEditTriggers) # MAKE CELLS NON-EDITABLE
         self.lightTable.setStyleSheet("QTableWidget { background-color: #222b33 ; color: white; }")
         for y in range(len(TABLE_HEADER)):
@@ -94,20 +93,27 @@ class LightManagerUI(QWidget):
         group_box_02.setStyleSheet("QGroupBox { border: 1px solid grey; border-radius: 3px; padding: 3px;}")
         layoutV_01   = QVBoxLayout()
         layoutV_02   = QVBoxLayout()
+        layoutV_01_01   = QVBoxLayout()
+        layoutH_02   = QHBoxLayout()
+        layoutH_03   = QHBoxLayout()
         
-        layoutV_01.addWidget(self.button_render)
-        layoutV_01.addWidget(title_lightName)
-        layoutV_01.addWidget(self.entry_lightName)
-        layoutV_01.addWidget(title_lightType)
-        layoutV_01.addWidget(self.combo_lightType)
-        layoutV_01.addWidget(self.button_createlight)
-        layoutV_01.addWidget(self.button_rename)
+        layoutV_01_01.addWidget(self.button_render)
+        layoutH_02.addWidget(title_lightName)
+        layoutH_02.addWidget(self.entry_lightName)
+        layoutH_02.addWidget(title_lightType)
+        layoutH_02.addWidget(self.combo_lightType)
+        layoutH_03.addWidget(self.button_createlight)
+        layoutH_03.addWidget(self.button_rename)
         layoutV_02.addWidget(title_lighSearch)
         layoutV_02.addWidget(self.entry_lighSearch)
         layoutV_02.addWidget(self.lightTable)
         layoutV_02.addWidget(self.button_refresh)
         layoutV_02.addWidget(self.button_delete)
     
+        layoutV_01.addLayout(layoutV_01_01)
+        layoutV_01.addLayout(layoutH_02)
+        layoutV_01.addLayout(layoutH_03)
+        
         group_box_01.setLayout(layoutV_01)
         group_box_02.setLayout(layoutV_02)
         
@@ -127,8 +133,9 @@ class LightManagerUI(QWidget):
         label.setStyleSheet(f"color:{COLOR}")
         return label
 
-    def bar_text(self,text=None):
+    def bar_text(self,text=None, length=20):
         line_edit = QLineEdit(placeholderText=text)
+        line_edit.setFixedSize(QSize(length, 25))
         line_edit.setFont(QFont(FONT,FONT_SIZE))
         return line_edit
 
@@ -143,6 +150,7 @@ class LightManagerUI(QWidget):
         button = QPushButton(text)
         button.setFont(QFont(FONT,FONT_SIZE))
         return button
+
 
 class CustomLineEdit(QLineEdit):
         def __init__(self, parent=None):
