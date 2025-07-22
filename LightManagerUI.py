@@ -5,12 +5,12 @@ from maya import cmds as m
 
 maya_version = m.about(version=True)
 if int(maya_version) <= 2024:
-    from PySide2.QtCore import Qt, QSize
+    from PySide2.QtCore import Qt, QSize,Signal
     from PySide2.QtGui import QFont,QWheelEvent
     from PySide2.QtWidgets import (QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,
-                               QVBoxLayout,QHBoxLayout,QAbstractItemView,QGroupBox,QApplication)
+                               QVBoxLayout,QHBoxLayout,QAbstractItemView,QGroupBox,QApplication,QMessageBox)
 else:
-    from PySide6.QtCore import Qt, QSize
+    from PySide6.QtCore import Qt, QSize,Signal
     from PySide6.QtGui import QFont,QWheelEvent
     from PySide6.QtWidgets import (QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,
                                QVBoxLayout,QHBoxLayout,QAbstractItemView,QGroupBox,QApplication)
@@ -25,6 +25,15 @@ FONT_SIZE = 11
 
 
 class LightManagerUI(QWidget):
+    
+    signal_lightCreated = Signal(str,str,object) # (light_name, light_type, table_widget)
+    signal_lightRenamed = Signal(str,str,object) # (old_name, new_name,table_widget)
+    signal_lightSearch = Signal(str,object) # (search_text, table_widget)
+    signal_table_selection = Signal(object) # (table_widget)
+    signal_lightDeleted = Signal(object) # (table_widget)
+    signal_refresh = Signal(object) # (table_widget)
+    
+    
     lightTypes = {
         "aiPhotometricLight":None,
         "aiSkyDomeLight": None,
@@ -37,6 +46,7 @@ class LightManagerUI(QWidget):
     def __init__(self):
         super().__init__()
         self.buildUI()
+        self.connect_signals()
 
     # SET WINDOW --------------------------------------------
     def buildUI(self):
@@ -93,7 +103,7 @@ class LightManagerUI(QWidget):
         group_box_02.setStyleSheet("QGroupBox { border: 1px solid grey; border-radius: 3px; padding: 3px;}")
         layoutV_01   = QVBoxLayout()
         layoutV_02   = QVBoxLayout()
-        layoutV_01_01   = QVBoxLayout()
+        layoutV_01_01 = QVBoxLayout()
         layoutH_02   = QHBoxLayout()
         layoutH_03   = QHBoxLayout()
         
@@ -117,48 +127,94 @@ class LightManagerUI(QWidget):
         group_box_01.setLayout(layoutV_01)
         group_box_02.setLayout(layoutV_02)
         
-        main_layout = QVBoxLayout(self)
-        main_layout.addWidget(self.logo)
-        main_layout.addWidget(group_box_01)
-        main_layout.addWidget(group_box_02)
-        main_layout.addWidget(self.info_text)
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.addWidget(self.logo)
+        self.main_layout.addWidget(group_box_01)
+        self.main_layout.addWidget(group_box_02)
+        self.main_layout.addWidget(self.info_text)
         
-        main_layout.setAlignment(Qt.AlignCenter)
-        self.setLayout(main_layout)
+        self.main_layout.setAlignment(Qt.AlignCenter)
+        self.setLayout(self.main_layout)
         
     # GENERIC WIDGETS --------------------------------------------
-    def label_text(self,text):
+    def label_text(self,text:str):
         label = QLabel(text=text)
         label.setFont(QFont(FONT,FONT_SIZE))
         label.setStyleSheet(f"color:{COLOR}")
         return label
 
-    def bar_text(self,text=None, length=20):
+    def bar_text(self,text:str=None, length=20):
         line_edit = QLineEdit(placeholderText=text)
         line_edit.setFixedSize(QSize(length, 25))
         line_edit.setFont(QFont(FONT,FONT_SIZE))
         return line_edit
 
-    def combo_list(self,light_list):
+    def combo_list(self,light_list:dict):
         combo_box = QComboBox()
         for light in sorted(light_list):
             combo_box.addItem(light)
             combo_box.setFont(QFont(FONT,FONT_SIZE))
         return combo_box
 
-    def push_button(self,text):
+    def push_button(self,text:str):
         button = QPushButton(text)
         button.setFont(QFont(FONT,FONT_SIZE))
         return button
 
+    # SIGNALS --------------------------------------------
+    def connect_signals(self):
+        self.button_createlight.clicked.connect(self.emit_lightCreated)
+        self.button_rename.clicked.connect(self.emit_lightRenamed)
+        self.button_refresh.clicked.connect(self.emit_refresh)
+        self.button_delete.clicked.connect(self.emit_lightDeleted)
+        self.lightTable.itemSelectionChanged.connect(self.emit_table_selection)
+        self.entry_lighSearch.textChanged.connect(self.emit_lightSearch)
+        
+    # EMITTERS --------------------------------------
+    def emit_lightCreated(self):
+       self.light_name = self.entry_lightName.text()
+       self.light_type = self.combo_lightType.currentText()
+       self.signal_lightCreated.emit( self.light_name, self.light_type,self.lightTable)
+       self.entry_lightName.clear()
+    
+    def emit_lightRenamed(self):
+        if self.lightTable.selectedItems():
+            self.old_name = self.lightTable.currentItem().text()
+            self.new_name = self.entry_lightName.text()
+            self.signal_lightRenamed.emit(self.old_name, self.new_name, self.lightTable)
+            self.entry_lightName.clear()
+    
+    def emit_lightDeleted(self):
+        if self.lightTable.selectedItems():
+            selection = self.lightTable.currentItem().text()
+            btn_question = QMessageBox.question(self,"Question", f"Are you sure you want to delete {selection} ?")
+            if btn_question == QMessageBox.Yes:
+                self.signal_lightDeleted.emit(self.lightTable)
+            else:
+                pass
+        
+    def emit_lightSearch(self):
+        search_text = self.entry_lighSearch.text()
+        self.signal_lightSearch.emit(search_text, self.lightTable)
+        
+    def emit_table_selection(self):
+        self.signal_table_selection.emit(self.lightTable)
+        
+    def emit_refresh(self):
+        self.signal_refresh.emit(self.lightTable)
 
-class CustomLineEdit(QLineEdit):
+
+"""
+Custom Line Edit for Numeric Input with Wheel Event Support.
+Ctrl + Scroll to Adjust Value(0.01) or Shift + Scroll to Adjust Value(0.001).
+"""
+class CustomLineEditNum(QLineEdit):
         def __init__(self, parent=None):
             super().__init__(parent)
             self.setText("0.000") 
 
         def wheelEvent(self, event: QWheelEvent):
-            modifiers = QApplication.keyboardModifiers()
+            modifiers = QApplication.keyboardModifiers() # Get the current keyboard modifiers
             if modifiers == Qt.ControlModifier:
                 step = 0.01
             elif modifiers ==   Qt.ShiftModifier:
