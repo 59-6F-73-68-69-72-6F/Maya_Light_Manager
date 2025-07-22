@@ -32,11 +32,11 @@ import os
 logic = None
 ui = None
 
-def getMayaMainWindow():
+def getMayaMainWindow()-> lmui.LightManagerUI:
     global ui,logic
     
     ui = lmui.LightManagerUI()
-    logic = mll.MayaLightLogic()
+    logic = mll.MayaLightLogic(ui)
     
     # LOAD LOGO IMAGE
     script_path = os.path.dirname(os.path.abspath(__file__))  # GET THE PATH OF THE CURRENT SCRIPT
@@ -52,7 +52,6 @@ def getMayaMainWindow():
     ui.button_render.clicked.connect(logic.render) 
     ui.signal_lightDeleted.connect(logic.delete)
     ui.signal_refresh.connect(logic.refresh)
-    
     logic.refresh(ui.lightTable)  # INITIAL REFRESH TO LOAD LIGHTS
     
     ui.show()

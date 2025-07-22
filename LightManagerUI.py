@@ -60,6 +60,7 @@ class LightManagerUI(QWidget):
     
         title_lightName = self.label_text("Light Name:")
         self.entry_lightName = self.bar_text("Name your light", 160)
+        
         self.info_text = self.label_text("Light Manager initialized")
         self.info_text.setFont(QFont(FONT,9))
         
@@ -161,6 +162,7 @@ class LightManagerUI(QWidget):
         button.setFont(QFont(FONT,FONT_SIZE))
         return button
 
+        
     # SIGNALS --------------------------------------------
     def connect_signals(self):
         self.button_createlight.clicked.connect(self.emit_lightCreated)

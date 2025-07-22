@@ -6,12 +6,10 @@ import maya.cmds as m
 maya_version = m.about(version=True)
 if int(maya_version) <= 2024:
     from PySide2.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QLineEdit
-    from PySide2.QtCore import Qt,QTimer,QObject
-    from PySide2.QtGui import QFont
+    from PySide2.QtCore import Qt,QTimer,QObject, Signal
 else:
     from PySide6.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QLineEdit
     from PySide6.QtCore import Qt, QTimer,QObject
-    from PySide6.QtGui import QFont
 
 from LightManagerUI import CustomLineEditNum
 from functools import partial
@@ -20,8 +18,9 @@ import mtoa.utils as au
 
 class MayaLightLogic(QObject):
     
-    def __init__(self):
+    def __init__(self,ui):
         super().__init__()
+        self.ui = ui
         self.script_jobs = [] # JOB ID COLLECTOR
         self.lightTypes = {
             "aiPhotometricLight": None,
@@ -37,7 +36,7 @@ class MayaLightLogic(QObject):
             m.rename(old_name, "LGT_"+new_name+"_000")          # RENAME WITH A NANING CONVENTION
             self.refresh(light_table)
             self.info_timer(f"Light: '{old_name}' renamed to 'LGT_{new_name}_000'")
-        except RuntimeError as e:
+        except ValueError as e:
             self.info_timer(f"Error: Wrong input - {e}")
         
     def refresh(self,light_table:object):
@@ -62,9 +61,9 @@ class MayaLightLogic(QObject):
                         self.entry_attrNum_to_list(transform,"aiExposure",5,light_table)
                         self.entry_attrNum_to_list(transform,"aiSamples",6,light_table)
                         self.Entry_attrText_to_list(f"{lightshape}.aiAov",7,light_table)
-                        # self.info_timer("Light Manager refreshed successfully.")
+                        self.info_timer("Light Manager refreshed successfully.")
                     else:
-                        # self.info_timer(f"'{transform}' is not allowed by the manager - warning {node_type}")
+                        self.info_timer(f"'{transform}' is not allowed by the manager - warning {node_type}")
                         pass
         m.select(clear=True)
 
@@ -92,7 +91,7 @@ class MayaLightLogic(QObject):
             
     def create_light(self,light_name:str, light_type:str,light_table:object):
         if light_type not in self.lightTypes:
-            print(f"Error: Light type '{light_type}' is invalid or not selected in the ComboBox.")
+            self.info_timer(f"Error: Light type '{light_type}' is invalid or not selected in the ComboBox.")
             return None
         lightType_key = light_type
         func = self.lightTypes[lightType_key]  # PREBUILD MAYA LIGHT CREATION  COMMAND LINE 
@@ -114,13 +113,13 @@ class MayaLightLogic(QObject):
             light_transform = m.ls(selection=True, long=True)[0][1:]
             
         if not light_transform or not m.objExists(light_transform):
-            print(f"Failed to create light: {naming_convention}")
+            self.info_timer(f"Failed to create light: {naming_convention}")
             return None
 
         light_shape_nodes = m.listRelatives(light_transform, shapes=True, fullPath=True)
         
         if not light_shape_nodes:
-            print(f"Could not find shape node for {light_name}")
+            self.info_timer(f"Could not find shape node for {light_name}")
             return None
             
         light_shape = light_shape_nodes[0]
@@ -133,7 +132,7 @@ class MayaLightLogic(QObject):
         self.entry_attrNum_to_list(light_transform,"aiExposure",5,light_table)
         self.Entry_attrText_to_list(f"{light_shape}.aiAov",7,light_table)
 
-        # self.info_timer(f"'{lightType_key}': '{light_name}' has been created successfully.")
+        self.info_timer(f"'{lightType_key}': '{light_name}' has been created successfully.")
 
     def light_name_to_list(self, light_shape_name:str, light_transform_name:str, light_table:object):
         self.row_position = light_table.rowCount()
@@ -239,7 +238,7 @@ class MayaLightLogic(QObject):
     def Entry_attrText_to_list(self, light_shape_name:str,column:int,light_table:object):
         full_attr_name = f"{light_shape_name}"
         current_value = m.getAttr(full_attr_name)
-        bar_text = QLineEdit(text=current_value)
+        bar_text = QLineEdit(placeholderText=current_value)
         bar_text.setFixedSize(59, 29)
         bar_text.setAlignment(Qt.AlignCenter)
         bar_text.setContentsMargins(0,0,0,0)
@@ -320,7 +319,7 @@ class MayaLightLogic(QObject):
     # GET THE LIGHT COLOR VALUE 
     def setColor(self,light_name:str,color_button:QPushButton):
         if not isinstance(light_name, str) or not m.objExists(light_name):
-            print(f"Error: Light '{light_name}' does not exist or is invalid.")
+            self.info_timer(f"Error: Light '{light_name}' does not exist or is invalid.")
             return
         
         lightColor = m.getAttr(light_name + ".color")[0]        #  GET THE ACTUAL LIGHT COLOR 
@@ -359,8 +358,7 @@ class MayaLightLogic(QObject):
         m.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
         m.arnoldRenderView(mode="open")
         
-    def info_timer(self,text:str, duration_ms:int=3500, info_text=object):
-        info_text.setFont(QFont("Nimbus Sans, Bold",9))
-        info_text.setText(text)
-        QTimer.singleShot(duration_ms, lambda: info_text.setText(""))
+    def info_timer(self,text:str, duration_ms:int=3500):
+        self.ui.info_text.setText(text)
+        QTimer.singleShot(duration_ms, lambda: self.ui.info_text.setText(""))
         
