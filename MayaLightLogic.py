@@ -151,7 +151,8 @@ class MayaLightLogic(QObject):
         if light_type in ["aiAreaLight", "aiSkyDomeLight","aiPhotometricLight"]:
             icon_path = os.path.join(SCRIPT_PATH, "img", "icons", f"{light_type[2:]}Shelf.png")
         else:
-            icon_path = os.path.join(SCRIPT_PATH, "img", "icons", f"{light_type}Shelf.png")
+            icon_path = os.path.join(SCRIPT_PATH, "img", "icons", f"{light_type}.png")
+            print(icon_path)
         
         img = QPixmap(icon_path)
         icon_light_type.setPixmap(img)
