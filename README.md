@@ -24,7 +24,7 @@
 
    * All Your Lights in One Place: Automatically lists all compatible Maya and Arnold lights (aiAreaLight, aiSkyDomeLight, etc.) in a clean, organized table.
    * Instant Light Creation: Quickly create lights with descriptive names (e.g., "key," "rim"). The tool handles the technical naming (LGT_KEY_000) for a tidy scene.
-   * Direct Attribute Control: Modify essential light attributes directly in the list—no need to select anything in the viewport:
+   * Direct Attribute Control: Modify essential light attributes directly in the list— no need to select anything in the viewport:
        * Mute & Solo: Instantly toggle lights on/off with the 'M' checkbox, or isolate a single light's contribution with the 'S' (Solo) checkbox.
        * Interactive Adjustments: Tweak Exposure and Samples on the fly. You can even use Ctrl+Scroll or Shift+Scroll over the number fields for fine-tuned adjustments.
        * Color Picker: A color swatch gives you one-click access to Maya's color editor to change a light's color.
