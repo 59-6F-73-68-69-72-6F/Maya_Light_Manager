@@ -15,13 +15,13 @@
 # . CLEAR AND EASY SAMPLES MANAGMENT
 ######################################################
 
-import maya.cmds as m
-
 from Qt.QtGui import QPixmap
+import os
+
+import maya.cmds as m
     
 import LightManagerUI as lmui
 import MayaLightLogic as mll
-import os
 
 logic = None
 ui = None

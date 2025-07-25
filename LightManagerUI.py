@@ -1,10 +1,9 @@
-from maya import cmds as m
-
 from Qt.QtCore import Qt, QSize,Signal
 from Qt.QtGui import QFont,QWheelEvent
 from Qt.QtWidgets import (QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,
                             QVBoxLayout,QHBoxLayout,QAbstractItemView,QGroupBox,QApplication,QMessageBox)
 
+from maya import cmds as m
 
 TABLE_HEADER = ["Name","M","S","Light","Color","Exposure","Samples","AOV"]
 HEADER_SIZE = [160,20,20,40,55,75,75,60]
@@ -152,7 +151,6 @@ class LightManagerUI(QWidget):
         button.setFont(QFont(FONT,FONT_SIZE))
         return button
 
-        
     # SIGNALS --------------------------------------------
     def connect_signals(self):
         self.button_createlight.clicked.connect(self.emit_lightCreated)

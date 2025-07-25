@@ -6,12 +6,12 @@ from Qt.QtCore import Qt,QTimer,QObject
 from Qt.QtGui import QPixmap
 
 import mtoa.utils as au
-
 import maya.cmds as m
+
 from LightManagerUI import CustomLineEditNum
 
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
-maya_version = m.about(version=True)
+
 
 class MayaLightLogic(QObject):
     
