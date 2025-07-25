@@ -104,7 +104,6 @@ class MayaLightLogic(QObject):
         if lightType_key in ["aiAreaLight", "aiSkyDomeLight","aiPhotometricLight"]:
             light_nodes = au.createLocator(lightType_key, asLight=True)
             light_transform = m.rename(light_nodes[1], naming_convention)
-            
         else:
             # MAYALIGHT
             light_shape = func(name=naming_convention)
