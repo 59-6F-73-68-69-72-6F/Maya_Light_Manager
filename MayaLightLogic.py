@@ -209,7 +209,7 @@ class MayaLightLogic(QObject):
         bar_text.setAlignment(Qt.AlignCenter)
         bar_text.setContentsMargins(0,0,0,0)
         
-        def update_maya_from_ui():
+        def _update_maya_from_ui():
             try:
                 new_value = float(bar_text.text())             # GET VALUE FROM UI
                 m.setAttr(full_attr_name, new_value)             # SET VALUE IN MAYA
@@ -221,11 +221,9 @@ class MayaLightLogic(QObject):
                     bar_text.setText(f"{current_maya_val:.3f}")
                 elif isinstance(current_maya_val, (int)):
                     bar_text.setText(f"{current_maya_val}")
+        bar_text.returnPressed.connect(_update_maya_from_ui)
 
-
-        bar_text.returnPressed.connect(update_maya_from_ui)
-
-        def update_ui_from_maya(*args):
+        def _update_ui_from_maya(*args):
             if not m.objExists(light_transform_name):
                 return 
             bar_text.blockSignals(True)                # AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
@@ -239,7 +237,7 @@ class MayaLightLogic(QObject):
                 bar_text.blockSignals(False)          # RE-ESTABLISHE THE SIGNAL
 
         # CREATE A SCRIPT JOB TO LISTEN FOR CHANGES AND STORE ID FOR CLEANUP
-        job_id = m.scriptJob(attributeChange=[full_attr_name, update_ui_from_maya])
+        job_id = m.scriptJob(attributeChange=[full_attr_name, _update_ui_from_maya])
         self.script_jobs.append(job_id)
         light_table.setCellWidget(self.row_position, column, bar_text)
 
@@ -252,7 +250,7 @@ class MayaLightLogic(QObject):
         bar_text.setAlignment(Qt.AlignCenter)
         bar_text.setContentsMargins(0,0,0,0)
         
-        def update_maya_from_ui():
+        def _update_maya_from_ui():
             try:
                 new_value = bar_text.text()
                 m.setAttr(full_attr_name, new_value, type='string')
@@ -262,10 +260,9 @@ class MayaLightLogic(QObject):
                 # ON ERROR, Reset the text to the current value in MAYA
                 current_maya_val = m.getAttr(full_attr_name)
                 bar_text.setText(current_maya_val)
+        bar_text.returnPressed.connect(_update_maya_from_ui)
 
-        bar_text.returnPressed.connect(update_maya_from_ui)
-
-        def update_ui_from_maya(*args:str):
+        def _update_ui_from_maya(*args:str):
             if not m.objExists(light_shape_name):
                 return 
             bar_text.blockSignals(True)                     #  AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
@@ -276,7 +273,7 @@ class MayaLightLogic(QObject):
                 bar_text.blockSignals(False)
 
         # CREATE A SCRIPT JOB TO LISTEN FOR CHANGES AND STORE ID FOR CLEANUP
-        job_id = m.scriptJob(attributeChange=[full_attr_name, update_ui_from_maya])
+        job_id = m.scriptJob(attributeChange=[full_attr_name, _update_ui_from_maya])
         self.script_jobs.append(job_id)
         light_table.setCellWidget(self.row_position, column, bar_text)
 
@@ -294,7 +291,6 @@ class MayaLightLogic(QObject):
                             solo_checkbox.blockSignals(False)
         self.update_all_lights_visibility(light_table)
 
-    
     def update_all_lights_visibility(self,light_table:object, *args:str):
         """Updates the visibility of all lights based on the UI state (solo or mute)."""
         soloed_row = -1
@@ -318,7 +314,6 @@ class MayaLightLogic(QObject):
             light_name = light_name_item.text()
             if not m.objExists(light_name):
                 continue
-            
             mute_checkbox = mute_widget.findChild(QCheckBox)
 
             if m.objExists(light_name) and mute_checkbox:

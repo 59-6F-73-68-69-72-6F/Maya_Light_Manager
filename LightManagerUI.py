@@ -204,8 +204,8 @@ Custom Line Edit for Numeric Input with Wheel Event Support.
 Ctrl + Scroll to Adjust Value(0.01) or Shift + Scroll to Adjust Value(0.001).
 """
 class CustomLineEditNum(QLineEdit):
-        def __init__(self, parent=None):
-            super().__init__(parent)
+        def __init__(self,):
+            super().__init__()
             self.setText("0.000") 
 
         def wheelEvent(self, event: QWheelEvent):
