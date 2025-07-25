@@ -28,7 +28,7 @@
        * Mute & Solo: Instantly toggle lights on/off with the 'M' checkbox, or isolate a single light's contribution with the 'S' (Solo) checkbox.
        * Interactive Adjustments: Tweak Exposure and Samples on the fly. You can even use Ctrl+Scroll or Shift+Scroll over the number fields for fine-tuned adjustments.
        * Color Picker: A color swatch gives you one-click access to Maya's color editor to change a light's color.
-       * AOV Management: Assign lights to specific AOVs (Arbitrary Output Variables) directly from the UI.
+       * AOV Group Management: Assign lights to specific AOVs (Arbitrary Output Variables) directly from the UI.
    * Efficient Scene Management:
        * Search & Filter: Instantly find lights by name with the built-in search bar.
        * Rename & Delete: Safely rename or delete lights from the scene with a single click (deletion requires confirmation).
