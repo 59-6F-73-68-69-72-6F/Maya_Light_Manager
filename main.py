@@ -1,7 +1,7 @@
 ######################################################
 # - MAYA LIGHT MANAGER -
 # AUTHOR : RUDY LETI
-# DATE : 2025/07/09
+# DATE : 2025/07/25
 # DESIGNED TO SPEED UP LIGHTING PRODUCTION PROCESS
 #
 # .LIST THE MOST COMMON LIGHTS USED IN PRODUCTION (ARNOLD ORIENTED) IN THE SCENE ( CREATE,GATHER , RENAME AND DELETE LIGHTS)
@@ -15,8 +15,6 @@
 # . CLEAR AND EASY SAMPLES MANAGMENT
 ######################################################
 
-# VERSION CHECK
-# This code is designed to work with Maya versions 2024 and earlier.
 import maya.cmds as m
 
 from Qt.QtGui import QPixmap

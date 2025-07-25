@@ -1,6 +1,3 @@
-# VERSION CHECK
-# This code is designed to work with Maya versions 2024 and earlier.
-
 from maya import cmds as m
 
 from Qt.QtCore import Qt, QSize,Signal

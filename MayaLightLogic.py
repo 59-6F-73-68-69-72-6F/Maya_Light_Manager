@@ -1,6 +1,3 @@
-# VERSION CHECK
-# This code is designed to work with Maya versions 2024 and earlier.
-
 import maya.cmds as m
 
 maya_version = m.about(version=True)
