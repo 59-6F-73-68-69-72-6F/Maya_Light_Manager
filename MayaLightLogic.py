@@ -1,17 +1,17 @@
-import maya.cmds as m
-
-maya_version = m.about(version=True)
+from functools import partial
+import os
 
 from Qt.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QLineEdit,QLabel
 from Qt.QtCore import Qt,QTimer,QObject
 from Qt.QtGui import QPixmap
 
-from LightManagerUI import CustomLineEditNum
-from functools import partial
 import mtoa.utils as au
-import os
+
+import maya.cmds as m
+from LightManagerUI import CustomLineEditNum
 
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
+maya_version = m.about(version=True)
 
 class MayaLightLogic(QObject):
     
