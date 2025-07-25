@@ -13,7 +13,8 @@
 
 
   <p align="center">
-    <img width="606" alt="Maya Light Manager UI" src="https://github.com/user-attachments/assets/1dba0332-8fe9-459e-a4f1-75e7961ab76a">
+    <img width="610" height="715" alt="image" src="https://github.com/user-attachments/assets/cbf9bab2-8728-4f86-92e7-f5b34c8929e8" />
+
   </p>
 
   ---
