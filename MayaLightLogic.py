@@ -4,23 +4,24 @@
 import maya.cmds as m
 
 maya_version = m.about(version=True)
-if int(maya_version) <= 2024:
-    from PySide2.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QLineEdit
-    from PySide2.QtCore import Qt,QTimer,QObject, Signal
-else:
-    from PySide6.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QLineEdit
-    from PySide6.QtCore import Qt, QTimer,QObject
+
+from Qt.QtWidgets import QWidget,QTableWidgetItem,QPushButton,QHBoxLayout,QCheckBox,QLineEdit,QLabel
+from Qt.QtCore import Qt,QTimer,QObject
+from Qt.QtGui import QPixmap
 
 from LightManagerUI import CustomLineEditNum
 from functools import partial
 import mtoa.utils as au
+import os
 
+SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 class MayaLightLogic(QObject):
     
     def __init__(self,ui):
         super().__init__()
         self.ui = ui
+        self.maya_path = os.environ.get('MAYA_LOCATION')
         self.script_jobs = [] # JOB ID COLLECTOR
         self.lightTypes = {
             "aiPhotometricLight": None,
@@ -140,14 +141,22 @@ class MayaLightLogic(QObject):
 
         # POPULATE THE "Name" COLUMN
         name_item = QTableWidgetItem(light_transform_name)
-        name_item.setTextAlignment(Qt.AlignCenter)
+        name_item.setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         light_table.setItem(self.row_position, 0, name_item)
 
         # POPULATE THE "Light Type" COLUMN
         light_type = m.nodeType(light_shape_name)
-        type_item = QTableWidgetItem(light_type)
-        type_item.setTextAlignment(Qt.AlignCenter)
-        light_table.setItem(self.row_position, 3, type_item)
+        icon_light_type = QLabel()
+        
+        if light_type in ["aiAreaLight", "aiSkyDomeLight","aiPhotometricLight"]:
+            icon_path = f"{SCRIPT_PATH}\img\icons\{light_type[2:]}Shelf.png"
+        else:
+            icon_path = f"{SCRIPT_PATH}\img\icons\{light_type}.png"
+        
+        img = QPixmap(icon_path)
+        icon_light_type.setPixmap(img)
+        icon_light_type.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        light_table.setCellWidget(self.row_position, 3, icon_light_type)
 
     # MUTE AND SOLO CHECKBOX, ONE WIDGET BY CELL
     def mute_solo_to_list(self, light_transform_name:int,light_table:object):

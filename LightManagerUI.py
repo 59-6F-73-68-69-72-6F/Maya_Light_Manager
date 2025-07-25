@@ -3,21 +3,14 @@
 
 from maya import cmds as m
 
-maya_version = m.about(version=True)
-if int(maya_version) <= 2024:
-    from PySide2.QtCore import Qt, QSize,Signal
-    from PySide2.QtGui import QFont,QWheelEvent
-    from PySide2.QtWidgets import (QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,
-                               QVBoxLayout,QHBoxLayout,QAbstractItemView,QGroupBox,QApplication,QMessageBox)
-else:
-    from PySide6.QtCore import Qt, QSize,Signal
-    from PySide6.QtGui import QFont,QWheelEvent
-    from PySide6.QtWidgets import (QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,
-                               QVBoxLayout,QHBoxLayout,QAbstractItemView,QGroupBox,QApplication)
+from Qt.QtCore import Qt, QSize,Signal
+from Qt.QtGui import QFont,QWheelEvent
+from Qt.QtWidgets import (QWidget,QTableWidget,QComboBox,QLabel,QLineEdit,QPushButton,
+                            QVBoxLayout,QHBoxLayout,QAbstractItemView,QGroupBox,QApplication,QMessageBox)
 
 
-TABLE_HEADER = ["Name","M","S","LightType","Color","Exposure","Samples","AOV"]
-HEADER_SIZE = [160,20,20,90,55,75,75,60]
+TABLE_HEADER = ["Name","M","S","Light","Color","Exposure","Samples","AOV"]
+HEADER_SIZE = [160,20,20,40,55,75,75,60]
 FONT = "Nimbus Sans, Bold"
 COLOR = "#c7c7c5"
 FONT_WEIGHT = 600
@@ -82,7 +75,7 @@ class LightManagerUI(QWidget):
         self.button_render.setLayoutDirection(Qt.RightToLeft)  # SET THE BUTTON TO POINT RIGHT
         self.button_render.setStyleSheet(" background-color: #FFC107 ; color: black;")
         
-        self.button_rename = self.push_button("Light Renamer")
+        self.button_rename = self.push_button("Rename Light")
         self.button_rename.setStyleSheet(" background-color: #D17D98 ; color: white;")
         
         self.button_delete = self.push_button("Delete")
