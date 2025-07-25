@@ -13,7 +13,8 @@
 
 
   <p align="center">
-    <img width="606" alt="Maya Light Manager UI" src="https://github.com/user-attachments/assets/1dba0332-8fe9-459e-a4f1-75e7961ab76a">
+    <img width="610" height="715" alt="image" src="https://github.com/user-attachments/assets/cbf9bab2-8728-4f86-92e7-f5b34c8929e8" />
+
   </p>
 
   ---
@@ -23,11 +24,11 @@
 
    * All Your Lights in One Place: Automatically lists all compatible Maya and Arnold lights (aiAreaLight, aiSkyDomeLight, etc.) in a clean, organized table.
    * Instant Light Creation: Quickly create lights with descriptive names (e.g., "key," "rim"). The tool handles the technical naming (LGT_KEY_000) for a tidy scene.
-   * Direct Attribute Control: Modify essential light attributes directly in the list—no need to select anything in the viewport:
+   * Direct Attribute Control: Modify essential light attributes directly in the list — no need to select anything in the viewport:
        * Mute & Solo: Instantly toggle lights on/off with the 'M' checkbox, or isolate a single light's contribution with the 'S' (Solo) checkbox.
        * Interactive Adjustments: Tweak Exposure and Samples on the fly. You can even use Ctrl+Scroll or Shift+Scroll over the number fields for fine-tuned adjustments.
        * Color Picker: A color swatch gives you one-click access to Maya's color editor to change a light's color.
-       * AOV Management: Assign lights to specific AOVs (Arbitrary Output Variables) directly from the UI.
+       * AOV Group Management: Assign lights to specific AOVs (Arbitrary Output Variables) directly from the UI.
    * Efficient Scene Management:
        * Search & Filter: Instantly find lights by name with the built-in search bar.
        * Rename & Delete: Safely rename or delete lights from the scene with a single click (deletion requires confirmation).
