@@ -1,40 +1,49 @@
-<h1 style="color: #5DADE2;">Maya Light Manager 🔦</h1>
+  <h1 align="center" style="color: #5DADE2;">Maya Light Manager 🔦</h1>
 
-<blockquote style="color:rgb(85, 88, 91);">A custom tool for Autodesk Maya to significantly speed up the lighting workflow, particularly for artists using the Arnold renderer.</blockquote>
-
-The **Maya Light Manager**, provides a compact and efficient user interface that centralizes the management of all supported lights within a Maya scene. Instead of navigating through the Outliner and Attribute Editor, artists can perform most common lighting tasks from a single, intuitive panel.
-
-<h2 style="color: #48C9B0;">Key Features</h2>
-
-*   **Centralized Light Lister**: Automatically gathers and lists all compatible lights (standard Maya lights and Arnold lights like `aiAreaLight`, `aiSkyDomeLight`, etc.) in a clean, organized table.
-
-*   **Quick Light Creation**: Create new lights by selecting a type and giving them a descriptive name (e.g., "key", "rim"). The tool automatically applies a professional naming convention (`LGT_KEY_000`).
-
-*   **Direct Attribute Control**: Modify essential light attributes directly from the list without selecting the light in Maya:
-    *   **Mute/Solo**: Toggle lights on/off with the 'M' (Mute) checkbox or isolate a single light with the 'S' (Solo) checkbox to see its individual contribution.
-    *   **Color**: A color swatch allows you to open the Maya color picker and change a light's color instantly.
-    *   **Exposure, Samples, & AOV Light Grp**: Edit numeric fields for Exposure and Samples directly. You can even use the mouse wheel (with Ctrl/Shift) to increment/decrement values. The light's AOV Grp (Arbitrary Output Variable) can also be set.
-
-*   **Efficient Scene Management**:
-    *   **Rename & Delete**: Select a light in the UI to rename or delete it from the scene (with a confirmation prompt for deletion).
-    *   **Search**: A search bar allows you to filter the list and quickly find specific lights by name.
-    *   **Render**: A dedicated "Render" button launches the Arnold RenderView to immediately see your changes.
-
-    *   **Refresh**: Instantly update the list to reflect any changes made elsewhere in Maya.
-
-*   **Real-time Sync**: The tool stays synchronized with the Maya scene. Any changes made to light attributes in the Attribute Editor are reflected back in the Light Manager's UI.
-
-<h2 style="color: #48C9B0;">Compatibility</h2>
-
-*   **Autodesk Maya**: The tool is designed for use with Autodesk Maya.
-*   **Arnold Renderer**: It is specifically optimized for workflows using the Arnold renderer and supports Arnold-specific lights.
-*   **Standard Lights**: It also maintains compatibility with standard Maya lights, making it versatile for various rendering setups.
-*   **Versions**: It is compatible with recent versions of Maya that include the Arnold plugin.
-
-<h2 style="color: #48C9B0;">Why Use the Light Manager?</h2>
-
-This application streamlines the entire lighting process by reducing clicks, centralizing controls, and providing workflow-enhancing features that allow lighting artists to work faster and more efficiently.
-
-<img width="606" height="842" alt="image" src="https://github.com/user-attachments/assets/1dba0332-8fe9-459e-a4f1-75e7961ab76a" />
+  <p align="center">
+    <strong>A professional toolkit for Autodesk Maya designed to dramatically accelerate your lighting workflow.</strong>
+  </p>
 
 
+  <p align="center">
+    Tired of endlessly navigating the Outliner and Attribute Editor to manage your lights? The Maya Light Manager provides a single, intuitive interface that centralizes
+  all your lighting controls, letting you focus on creativity, not clicks. Whether you're using Arnold or standard Maya lights, this tool puts everything you need right at
+   your fingertips.
+  </p>
+
+
+  <p align="center">
+    <img width="606" alt="Maya Light Manager UI" src="https://github.com/user-attachments/assets/1dba0332-8fe9-459e-a4f1-75e7961ab76a">
+  </p>
+
+  ---
+
+  <h2 style="color: #48C9B0;">🚀 Key Features</h2>
+
+
+   * All Your Lights in One Place: Automatically lists all compatible Maya and Arnold lights (aiAreaLight, aiSkyDomeLight, etc.) in a clean, organized table.
+   * Instant Light Creation: Quickly create lights with descriptive names (e.g., "key," "rim"). The tool handles the technical naming (LGT_KEY_000) for a tidy scene.
+   * Direct Attribute Control: Modify essential light attributes directly in the list—no need to select anything in the viewport:
+       * Mute & Solo: Instantly toggle lights on/off with the 'M' checkbox, or isolate a single light's contribution with the 'S' (Solo) checkbox.
+       * Interactive Adjustments: Tweak Exposure and Samples on the fly. You can even use Ctrl+Scroll or Shift+Scroll over the number fields for fine-tuned adjustments.
+       * Color Picker: A color swatch gives you one-click access to Maya's color editor to change a light's color.
+       * AOV Management: Assign lights to specific AOVs (Arbitrary Output Variables) directly from the UI.
+   * Efficient Scene Management:
+       * Search & Filter: Instantly find lights by name with the built-in search bar.
+       * Rename & Delete: Safely rename or delete lights from the scene with a single click (deletion requires confirmation).
+       * One-Click Render: Launch the Arnold RenderView with the dedicated "Render" button to immediately see your changes.
+   * Real-Time Sync: The tool stays perfectly synchronized with your Maya scene. Any change you make in the Attribute Editor is instantly reflected in the Light Manager, and
+      vice-versa.
+
+  <h2 style="color: #48C9B0;">✅ Why You'll Love It</h2>
+
+
+  The Maya Light Manager streamlines the entire lighting process. It reduces tedious navigation, centralizes critical controls, and introduces powerful workflow features
+  that allow lighting artists to iterate faster and work more efficiently. Spend less time managing and more time lighting.
+
+  <h2 style="color: #48C9B0;">Compatibility</h2>
+
+
+   * Autodesk Maya: Designed for modern versions of Maya.
+   * Arnold Renderer: Optimized for workflows using the Arnold renderer, with full support for Arnold-specific lights and attributes.
+   * Standard Lights: Maintains full compatibility with Maya's standard lights.
