@@ -45,10 +45,10 @@ class MayaLightLogic(QObject):
         """
         try:
             m.rename(old_name, "LGT_"+new_name+"_000")          # RENAME WITH A NANING CONVENTION
-            self.refresh(light_table)
-            self.info_timer(f"Light: '{old_name}' renamed to 'LGT_{new_name}_000'")
         except ValueError as e:
             self.info_timer(f"Error: Wrong input - {e}")
+        self.refresh(light_table)
+        self.info_timer(f"Light: '{old_name}' renamed to 'LGT_{new_name}_000'")
         
     def refresh(self,light_table:object):
         """
@@ -115,9 +115,9 @@ class MayaLightLogic(QObject):
             row = selected_items[0].row()
             light_name_item = lightTable.item(row, 0)
             if light_name_item:
+                light_name = light_name_item.text()
+                m.select(clear=True)
                 try:
-                    light_name = light_name_item.text()
-                    m.select(clear=True)
                     m.select(light_name)
                 except ValueError as e:
                     self.info_timer(f"Error:  '{light_name}' None Existent")
@@ -287,8 +287,8 @@ class MayaLightLogic(QObject):
         bar_text.setContentsMargins(0,0,0,0)
         
         def _update_maya_from_ui():
+            new_value = float(bar_text.text())                 # GET VALUE FROM UI
             try:
-                new_value = float(bar_text.text())             # GET VALUE FROM UI
                 m.setAttr(full_attr_name, new_value)           # SET VALUE IN MAYA
             except (ValueError, RuntimeError) as e:
                 self.info_timer(f"Wrong input:  Please enter a number")
@@ -304,8 +304,8 @@ class MayaLightLogic(QObject):
             if not m.objExists(light_transform_name):
                 return 
             bar_text.blockSignals(True)                        # AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
+            new_value = m.getAttr(full_attr_name)
             try:
-                new_value = m.getAttr(full_attr_name)
                 if isinstance(new_value, (float)):
                     bar_text.setText(f"{new_value:.3f}") 
                 elif isinstance(new_value, (int)):
@@ -338,10 +338,10 @@ class MayaLightLogic(QObject):
         bar_text.setContentsMargins(0,0,0,0)
         
         def _update_maya_from_ui():
+            new_value = bar_text.text()
             try:
-                new_value = bar_text.text()
                 m.setAttr(full_attr_name, new_value, type='string')
-                self.info_timer(f"{light_shape_name} set to AOV: '{new_value}'")
+                self.info_timer(text= f"{light_shape_name.split('.')[0].split('|')[2]} set AOV: '{new_value}'")
             except (ValueError, RuntimeError) as e:
                 self.info_timer(f"Invalid input : {e}")
                 # ON ERROR, Reset the text to the current value in MAYA
@@ -353,8 +353,8 @@ class MayaLightLogic(QObject):
             if not m.objExists(light_shape_name):
                 return 
             bar_text.blockSignals(True)                     #  AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
+            new_value = m.getAttr(full_attr_name)
             try:
-                new_value = m.getAttr(full_attr_name)
                 bar_text.setText(new_value)
             finally:
                 bar_text.blockSignals(False)
@@ -501,8 +501,7 @@ class MayaLightLogic(QObject):
 
         Args:
             text (str): The message to display.
-            duration_ms (int, optional): How long to display the message in milliseconds.
-                                         Defaults to 3500.
+            duration_ms (int, optional): How long to display the message in milliseconds. Defaults to 3500.
         """
         self.ui.info_text.setText(text)
         QTimer.singleShot(duration_ms, lambda: self.ui.info_text.setText(""))
