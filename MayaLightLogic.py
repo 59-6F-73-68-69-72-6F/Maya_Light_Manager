@@ -16,6 +16,11 @@ SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 class MayaLightLogic(QObject):
     
     def __init__(self,ui):
+        """
+        Initializes the logic for the Light Manager.
+        Args:
+            ui (LightManagerUI): An instance of the UI class to which this logic will connect.
+        """
         super().__init__()
         self.ui = ui
         self.maya_path = os.environ.get('MAYA_LOCATION')
@@ -30,6 +35,14 @@ class MayaLightLogic(QObject):
             }
 
     def rename_light(self,old_name:str, new_name:str,light_table:object):
+        """
+        Renames a light in the Maya scene with a specific naming convention.
+
+        Args:
+            old_name (str): The current name of the light to rename.
+            new_name (str): The new base name for the light.
+            light_table (QTableWidget): The table widget to refresh after renaming.
+        """
         try:
             m.rename(old_name, "LGT_"+new_name+"_000")          # RENAME WITH A NANING CONVENTION
             self.refresh(light_table)
@@ -38,6 +51,17 @@ class MayaLightLogic(QObject):
             self.info_timer(f"Error: Wrong input - {e}")
         
     def refresh(self,light_table:object):
+        """
+        Clears and repopulates the entire UI table with lights from the Maya scene.
+        
+        This is the main function for synchronizing the UI with the scene. It first
+        kills all previously created scriptJobs to prevent errors, then finds all
+        lights matching the allowed types, and for each light, it populates a row
+        in the table with all the necessary widgets and callbacks.
+        
+        Args:
+            light_table (QTableWidget): The table widget to refresh.
+        """
         # KILL ALL EXISTING SCRIPTS JOB TO PREVENT ERRORS WITH DELETED WIDGETS
         for job_id in self.script_jobs:
             if m.scriptJob(exists=job_id):
@@ -66,13 +90,26 @@ class MayaLightLogic(QObject):
         m.select(clear=True)
 
     def delete(self,light_table:object):
+        """
+        Deletes the currently selected light from the Maya scene.
+        Args:
+            light_table (QTableWidget): The table widget to refresh after deletion.
+        """
         selection = m.ls(selection=True, dagObjects=True)
         m.delete(selection)
         self.refresh(light_table)
         self.info_timer(f"Light  '{selection[0]}' deleted successfully.")
 
-    # DESIGN THE WAY TO SELECT LIGHTS IN TABLE
     def lightTable_selection(self,lightTable:object):
+        """
+        Synchronizes the Maya scene selection with the UI table selection.
+        
+        When a user selects an item in the table, this function selects the
+        corresponding light node in the Maya scene.
+        
+        Args:
+            lightTable (QTableWidget): The table widget where the selection changed.
+        """
         selected_items = lightTable.selectedItems()
         if selected_items:
             row = selected_items[0].row()
@@ -88,6 +125,17 @@ class MayaLightLogic(QObject):
             m.select(clear=True)
             
     def create_light(self,light_name:str, light_type:str,light_table:object):
+        """
+        Creates a new light in the Maya scene based on UI inputs.
+
+        It handles both standard Maya lights and Arnold lights, applies a naming
+        convention, and then populates the UI table with the new light's information.
+
+        Args:
+            light_name (str): The base name for the new light.
+            light_type (str): The type of light to create (e.g., 'spotLight', 'aiAreaLight').
+            light_table (QTableWidget): The table to update with the new light.
+        """
         if light_type not in self.lightTypes:
             self.info_timer(f"Error: Light type '{light_type}' is invalid or not selected in the ComboBox.")
             return None
@@ -111,13 +159,13 @@ class MayaLightLogic(QObject):
             
         if not light_transform or not m.objExists(light_transform):
             self.info_timer(f"Failed to create light: {naming_convention}")
-            return None
+            return
 
         light_shape_nodes = m.listRelatives(light_transform, shapes=True, fullPath=True)
         
         if not light_shape_nodes:
             self.info_timer(f"Could not find shape node for {light_name}")
-            return None
+            return
             
         light_shape = light_shape_nodes[0]
         
@@ -132,6 +180,14 @@ class MayaLightLogic(QObject):
         self.info_timer(f"'{lightType_key}': '{light_name}' has been created successfully.")
 
     def light_name_to_list(self, light_shape_name:str, light_transform_name:str, light_table:object):
+        """
+        Populates the 'Name' and 'Light Type' columns for a new row in the table.
+        
+        Args:
+            light_shape_name (str): The name of the light's shape node.
+            light_transform_name (str): The name of the light's transform node.
+            light_table (QTableWidget): The table to add the row to.
+        """
         self.row_position = light_table.rowCount()
         light_table.insertRow(self.row_position)
 
@@ -154,9 +210,15 @@ class MayaLightLogic(QObject):
         icon_light_type.setPixmap(img)
         icon_light_type.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         light_table.setCellWidget(self.row_position, 3, icon_light_type)
-
-    # MUTE AND SOLO CHECKBOX, ONE WIDGET BY CELL
+        
     def mute_solo_to_list(self, light_transform_name:int,light_table:object):
+        """
+        Adds 'Mute' and 'Solo' checkboxes to the current row in the table.
+
+        Args:
+            light_transform_name (str): The name of the light's transform node.
+            light_table (QTableWidget): The table to add the widgets to.
+        """
         mute_widget = QWidget()
         mute_checkbox = QCheckBox()
         mute_checkbox.setStyleSheet("QCheckBox::indicator:unchecked { background-color: #f94144 }")
@@ -179,9 +241,15 @@ class MayaLightLogic(QObject):
         
         light_table.setCellWidget(self.row_position, 1, mute_widget)
         light_table.setCellWidget(self.row_position, 2, solo_widget)
-    
-    #  COLOR PALETTE CONTROLLER
+
     def colorButton_to_list(self, light_transform_name:str,light_table:object):
+        """
+        Adds a color swatch button to the current row in the table.
+
+        Args:
+            light_transform_name (str): The name of the light's transform node.
+            light_table (QTableWidget): The table to add the widget to.
+        """
         colorBtn_widget = QWidget()
         colorBtn = QPushButton()
         colorBtn.setFixedSize(40, 20)
@@ -193,11 +261,23 @@ class MayaLightLogic(QObject):
         colorBtn_layout.setContentsMargins(0,0,0,0)
         light_table.setCellWidget(self.row_position, 4, colorBtn_widget)
     
-    # GENERATE AN EDITABLE SECTION FOR ATTRIBUTE --> Float
+
     def entry_attrNum_to_list(self, light_transform_name:str,attribute_name:str,column:int,light_table:object):
+        """
+        Adds a numeric input field to a cell for a specific attribute.
+
+        This creates a two-way binding: changes in the UI update Maya, and
+        changes in Maya (via a scriptJob) update the UI.
+
+        Args:
+            light_transform_name (str): The light's transform node name.
+            attribute_name (str): The name of the numeric attribute to control (e.g., 'aiExposure').
+            column (int): The table column index to place this widget in.
+            light_table (QTableWidget): The table to add the widget to.
+        """
         full_attr_name = f"{light_transform_name}.{attribute_name}"
         current_value = m.getAttr(full_attr_name)
-        bar_text = CustomLineEditNum()                             # SETTING THE CURRENT VALUE IN THE UI
+        bar_text = CustomLineEditNum()                         # SETTING THE CURRENT VALUE IN THE UI
         if isinstance(current_value, (float)):
             bar_text.setText(f"{current_value:.3f}")
         elif isinstance(current_value, (int)):
@@ -209,7 +289,7 @@ class MayaLightLogic(QObject):
         def _update_maya_from_ui():
             try:
                 new_value = float(bar_text.text())             # GET VALUE FROM UI
-                m.setAttr(full_attr_name, new_value)             # SET VALUE IN MAYA
+                m.setAttr(full_attr_name, new_value)           # SET VALUE IN MAYA
             except (ValueError, RuntimeError) as e:
                 self.info_timer(f"Wrong input:  Please enter a number")
                 # ON ERROR, Reset the text to the current value in MAYA
@@ -223,7 +303,7 @@ class MayaLightLogic(QObject):
         def _update_ui_from_maya(*args):
             if not m.objExists(light_transform_name):
                 return 
-            bar_text.blockSignals(True)                # AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
+            bar_text.blockSignals(True)                        # AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
             try:
                 new_value = m.getAttr(full_attr_name)
                 if isinstance(new_value, (float)):
@@ -231,15 +311,25 @@ class MayaLightLogic(QObject):
                 elif isinstance(new_value, (int)):
                     bar_text.setText(f"{new_value}")
             finally:
-                bar_text.blockSignals(False)          # RE-ESTABLISHE THE SIGNAL
+                bar_text.blockSignals(False)                # RE-ESTABLISHE THE SIGNAL
 
         # CREATE A SCRIPT JOB TO LISTEN FOR CHANGES AND STORE ID FOR CLEANUP
         job_id = m.scriptJob(attributeChange=[full_attr_name, _update_ui_from_maya])
         self.script_jobs.append(job_id)
         light_table.setCellWidget(self.row_position, column, bar_text)
 
-    # GENERATE AN EDITABLE SECTION FOR ATTRIBUTE --> String
     def Entry_attrText_to_list(self, light_shape_name:str,column:int,light_table:object):
+        """
+        Adds a text input field to a cell for a specific string attribute.
+
+        This creates a two-way binding: changes in the UI update Maya, and
+        changes in Maya (via a scriptJob) update the UI.
+
+        Args:
+            light_shape_name (str): The light's shape node name (including attribute).
+            column (int): The table column index to place this widget in.
+            light_table (QTableWidget): The table to add the widget to.
+        """
         full_attr_name = f"{light_shape_name}"
         current_value = m.getAttr(full_attr_name)
         bar_text = QLineEdit(placeholderText=current_value)
@@ -275,7 +365,17 @@ class MayaLightLogic(QObject):
         light_table.setCellWidget(self.row_position, column, bar_text)
 
     def on_solo_toggled(self, toggled_row:int,light_table:object,state:bool):
-        """Ensures only one solo checkbox is active at a time and updates the scene."""
+        """
+        Callback for when a 'Solo' checkbox is toggled.
+
+        It ensures only one light can be soloed at a time. When a box is checked,
+        it unchecks any other currently soloed box, then triggers a visibility update.
+
+        Args:
+            toggled_row (int): The row index of the checkbox that was changed.
+            light_table (QTableWidget): The table containing the widgets.
+            state (bool): The new state of the checkbox (True if checked).
+        """
         if state:
             for i in range(light_table.rowCount()):                  # SKIP the ROW OF THE CHECKBOX THAT WAS JUST TOGGLED
                 if i != toggled_row:
@@ -289,7 +389,19 @@ class MayaLightLogic(QObject):
         self.update_all_lights_visibility(light_table)
 
     def update_all_lights_visibility(self,light_table:object, *args:str):
-        """Updates the visibility of all lights based on the UI state (solo or mute)."""
+        """
+        Updates the visibility of all lights based on the UI's Mute/Solo states.
+        
+        Logic:
+        1. Checks if any light is currently soloed.
+        2. If a light is soloed, it makes only that light visible.
+        3. If no light is soloed, it sets each light's visibility based on its
+           own 'Mute' checkbox state.
+
+        Args:
+            light_table (QTableWidget): The table containing the Mute/Solo widgets.
+            *args: Catches any extra arguments passed by Qt signals.
+        """
         soloed_row = -1
         # CHECK IF ANY LIGHT IS SOLOED
         for i in range(light_table.rowCount()):
@@ -317,8 +429,15 @@ class MayaLightLogic(QObject):
                 is_visible = (i == soloed_row) if soloed_row != -1 else mute_checkbox.isChecked()
                 m.setAttr(f"{light_name}.visibility", is_visible) # SET THE VISIBILITY OF THE CORRESPONDING LIGHT IN MAYA.
     
-    # GET THE LIGHT COLOR VALUE 
+
     def setColor(self,light_name:str,color_button:QPushButton):
+        """
+        Opens the Maya color editor to set a light's color.
+
+        Args:
+            light_name (str): The name of the light to modify.
+            color_button (QPushButton): The button in the UI whose color will be updated.
+        """
         if not isinstance(light_name, str) or not m.objExists(light_name):
             self.info_timer(f"Error: Light '{light_name}' does not exist or is invalid.")
             return
@@ -330,6 +449,14 @@ class MayaLightLogic(QObject):
         self.setButtonColor(light_name,color_button,(r, g, b))
     
     def setButtonColor(self,light_name:int,color_button:QPushButton, color:tuple=None):
+        """
+        Sets the background color of a button to match a light's color.
+
+        Args:
+            light_name (str): The name of the light to get the color from.
+            color_button (QPushButton): The UI button to update.
+            color (tuple, optional): The RGB color to set. If None, it's fetched from Maya.
+        """
         if not isinstance(light_name, str) or not m.objExists(light_name):
             self.info_timer(f"Error:  '{light_name}' does not exist or is invalid.")
             return
@@ -343,6 +470,13 @@ class MayaLightLogic(QObject):
         color_button.setStyleSheet(f"background-color: rgba({r},{g},{b}, 1.0)")
     
     def searchLight(self, *args:str|object):
+        """
+        Filters the visibility of rows in the table based on a search string.
+
+        Args:
+            args[0] (str): The text to search for in the light names.
+            args[1] (QTableWidget): The table whose rows will be filtered.
+        """
         search_text = args[0]
         if not search_text:
             self.refresh(args[1])
@@ -356,10 +490,20 @@ class MayaLightLogic(QObject):
                     args[1].hideRow(row)
                     
     def render(self):
+        """ Sets the current renderer to Arnold and opens the Arnold Render View. """
+
         m.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
         m.arnoldRenderView(mode="open")
         
     def info_timer(self,text:str, duration_ms:int=3500):
+        """
+        Displays a message in the UI's info label for a specified duration.
+
+        Args:
+            text (str): The message to display.
+            duration_ms (int, optional): How long to display the message in milliseconds.
+                                         Defaults to 3500.
+        """
         self.ui.info_text.setText(text)
         QTimer.singleShot(duration_ms, lambda: self.ui.info_text.setText(""))
         

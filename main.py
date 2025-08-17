@@ -27,6 +27,20 @@ logic = None
 ui = None
 
 def getMayaMainWindow()-> lmui.LightManagerUI:
+    """
+    Initializes and launches the Maya Light Manager UI.
+
+    This function performs the following key steps:
+    1. Creates instances of the `LightManagerUI` (the user interface) and
+       `MayaLightLogic` (the application logic).
+    2. Loads the application logo into the UI.
+    3. Connects the signals emitted by the UI (e.g., button clicks) to the
+       corresponding methods (slots) in the logic class. This establishes
+       the communication between the UI and the Maya scene operations.
+    4. Performs an initial refresh to populate the light list from the
+       current Maya scene.
+    5. Displays the UI window.
+    """
     global ui,logic
     
     ui = lmui.LightManagerUI()

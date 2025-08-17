@@ -14,6 +14,23 @@ FONT_SIZE = 11
 
 
 class LightManagerUI(QWidget):
+    """
+    The main user interface for the Maya Light Manager.
+
+    This class is responsible for building and displaying the GUI, which allows
+    users to create, rename, delete, and manage lights in a Maya scene. It is
+    built using Qt (via the Qt.py compatibility library).
+
+    The UI is constructed in the `buildUI` method. It consists of input fields
+    for light creation, a table to display scene lights, and buttons for various
+    actions.
+
+    This class communicates with the application's logic layer (e.g., MayaLightLogic.py)
+    through a system of Qt signals. User actions in the UI trigger specific
+    emitter methods (`emit_*`), which in turn emit signals with relevant data.
+    The logic layer should connect to these signals to perform the actual Maya
+    commands.
+    """
     
     signal_lightCreated = Signal(str,str,object) # (light_name, light_type, table_widget)
     signal_lightRenamed = Signal(str,str,object) # (old_name, new_name,table_widget)
@@ -23,22 +40,28 @@ class LightManagerUI(QWidget):
     signal_refresh = Signal(object) # (table_widget)
     
     
-    lightTypes = {
-        "aiPhotometricLight":None,
-        "aiSkyDomeLight": None,
-        "aiAreaLight": None,
-        "spotLight": m.spotLight,
-        "pointLight": m.pointLight,
-        "directionalLight": m.directionalLight,
-        }
+    lightTypes = [
+        "aiPhotometricLight",
+        "aiSkyDomeLight",
+        "aiAreaLight",
+        "spotLight",
+        "pointLight",
+        "directionalLight",
+        ]
 
     def __init__(self):
+        ''' Sets up the UI elements and connects signals to slots. '''
         super().__init__()
-        self.buildUI()
+        self.build_ui()
         self.connect_signals()
 
     # SET WINDOW --------------------------------------------
-    def buildUI(self):
+    def build_ui(self):
+        """
+        Constructs and lays out all the UI widgets for the window.
+        This includes setting up the window properties, creating buttons,
+        input fields, the main table, and organizing them into layouts.
+        """
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)  # KEEP WINDOW ON TOP
         self.setWindowTitle("Maya Light Manager")
         self.setMinimumSize(620,690)
@@ -127,32 +150,53 @@ class LightManagerUI(QWidget):
         self.setLayout(self.main_layout)
         
     # GENERIC WIDGETS --------------------------------------------
-    def label_text(self,text:str):
+    def label_text(self,text:str) -> QLabel:
+        """ Creates a QLabel with standardized font and color. 
+        Args:
+            text (str): The text to display in the label.
+        """
         label = QLabel(text=text)
         label.setFont(QFont(FONT,FONT_SIZE))
         label.setStyleSheet(f"color:{COLOR}")
         return label
 
-    def bar_text(self,text:str=None, length=20):
+    def bar_text(self,text:str=None, length=20) -> QLineEdit:
+        """ Creates a QLineEdit with standardized font and size.
+        Args:
+            text (str, optional): Placeholder text for the line edit. Defaults to None.
+            length (int, optional): The width of the line edit. Defaults to 20.
+        """
         line_edit = QLineEdit(placeholderText=text)
         line_edit.setFixedSize(QSize(length, 25))
         line_edit.setFont(QFont(FONT,FONT_SIZE))
         return line_edit
 
-    def combo_list(self,light_list:dict):
+    def combo_list(self,light_list:list) -> QComboBox:
+        """Creates a QComboBox populated with items from a list.
+        Args:
+            light_list (list): A list of strings to add as items to the combo box.
+        """
         combo_box = QComboBox()
         for light in sorted(light_list):
             combo_box.addItem(light)
             combo_box.setFont(QFont(FONT,FONT_SIZE))
         return combo_box
 
-    def push_button(self,text:str):
+    def push_button(self,text:str) -> QPushButton:
+        """Creates a QPushButton with a standardized font.
+        Args:
+            text (str): The text to display on the button.
+        """
         button = QPushButton(text)
         button.setFont(QFont(FONT,FONT_SIZE))
         return button
 
     # SIGNALS --------------------------------------------
     def connect_signals(self):
+        """
+        Connects UI widget signals (e.g., button clicks) to their
+        corresponding emitter methods in this class.
+        """
         self.button_createlight.clicked.connect(self.emit_lightCreated)
         self.button_rename.clicked.connect(self.emit_lightRenamed)
         self.button_refresh.clicked.connect(self.emit_refresh)
@@ -162,12 +206,21 @@ class LightManagerUI(QWidget):
         
     # EMITTERS --------------------------------------
     def emit_lightCreated(self):
+       """
+       Gathers light name and type from the UI and emits the `signal_lightCreated`.
+       Clears the light name field.
+       """
        self.light_name = self.entry_lightName.text()
        self.light_type = self.combo_lightType.currentText()
        self.signal_lightCreated.emit( self.light_name, self.light_type,self.lightTable)
        self.entry_lightName.clear()
     
     def emit_lightRenamed(self):
+        """
+        Gathers the old name from the table selection and the new name
+        from the input field, then emits the `signal_lightRenamed`.
+        Clears the light name field.
+        """
         if self.lightTable.selectedItems():
             self.old_name = self.lightTable.currentItem().text()
             self.new_name = self.entry_lightName.text()
@@ -175,6 +228,10 @@ class LightManagerUI(QWidget):
             self.entry_lightName.clear()
     
     def emit_lightDeleted(self):
+        """
+        Confirms with the user and then emits the `signal_lightDeleted`
+        for the currently selected light.
+        """
         if self.lightTable.selectedItems():
             selection = self.lightTable.currentItem().text()
             btn_question = QMessageBox.question(self,"Question", f"Are you sure you want to delete {selection} ?")
@@ -184,39 +241,53 @@ class LightManagerUI(QWidget):
                 pass
         
     def emit_lightSearch(self):
+        """
+        Gathers the search text from the input field and emits the
+        `signal_lightSearch`.
+        """
         search_text = self.entry_lighSearch.text()
         self.signal_lightSearch.emit(search_text, self.lightTable)
         
     def emit_table_selection(self):
+        """ Emits the `signal_table_selection` when the table selection changes. """
         self.signal_table_selection.emit(self.lightTable)
         
     def emit_refresh(self):
+        """ Emits the `signal_refresh. """
         self.signal_refresh.emit(self.lightTable)
 
 
-"""
-Custom Line Edit for Numeric Input with Wheel Event Support.
-Ctrl + Scroll to Adjust Value(0.01) or Shift + Scroll to Adjust Value(0.001).
-"""
 class CustomLineEditNum(QLineEdit):
-        def __init__(self,):
-            super().__init__()
-            self.setText("0.000") 
+    """
+    A custom QLineEdit that allows numerical values to be adjusted using the mouse wheel.
+    It supports different step sizes based on keyboard modifiers (Ctrl, Shift).
+    """
+    def __init__(self,):
+        """Initializes the QLineEdit and sets the default text."""
+        super().__init__()
+        self.setText("0.000") 
 
-        def wheelEvent(self, event: QWheelEvent):
-            modifiers = QApplication.keyboardModifiers() # Get the current keyboard modifiers
-            if modifiers == Qt.ControlModifier:
-                step = 0.01
-            elif modifiers ==   Qt.ShiftModifier:
-                step = 0.001
-            else:
-                super().wheelEvent(event)
-                return
-            
-            try:
-                current_value = float(self.text())
-                delta = event.angleDelta().y() / 120  
-                new_value = current_value + delta * step
-                self.setText(f"{new_value:.3f}")
-            except ValueError:
-                pass
+    def wheel_event(self, event: QWheelEvent):
+        """
+        Handles the wheel event to increment or decrement the QLineEdit's numerical value.
+        - Ctrl + Scroll: Adjusts the value by 0.01
+        - Shift + Scroll: Adjusts the value by 0.001
+        Args:
+            event (QWheelEvent): The wheel event.
+        """
+        modifiers = QApplication.keyboardModifiers() # Get the current keyboard modifiers
+        if modifiers == Qt.ControlModifier:
+            step = 0.01
+        elif modifiers ==   Qt.ShiftModifier:
+            step = 0.001
+        else:
+            super().wheel_event(event)
+            return
+        
+        try:
+            current_value = float(self.text())
+            delta = event.angleDelta().y() / 120  
+            new_value = current_value + delta * step
+            self.setText(f"{new_value:.3f}")
+        except ValueError:
+            pass
