@@ -292,9 +292,9 @@ class MayaLightLogic(QObject):
 
         def _update_maya_from_ui():
             # GET VALUE FROM UI
-            new_value = float(bar_text.text())
             try:
                 # SET VALUE IN MAYA
+                new_value = float(bar_text.text())
                 m.setAttr(full_attr_name, new_value)
             except (ValueError, RuntimeError) as e:
                 self.info_timer(f"Wrong input:  Please enter a number")
