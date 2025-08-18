@@ -23,7 +23,7 @@ class MayaLightLogic(QObject):
         """
         super().__init__()
         self.ui = ui
-        self.maya_path = os.environ.get('MAYA_LOCATION')
+        self.maya_path = os.environ.get("MAYA_LOCATION")
         self.script_jobs = []  # JOB ID COLLECTOR
         self.lightTypes = {
             "aiPhotometricLight": None,
@@ -45,7 +45,7 @@ class MayaLightLogic(QObject):
         """
         try:
             # RENAME WITH A NANING CONVENTION
-            m.rename(old_name, "LGT_"+new_name+"_000")
+            m.rename(old_name, "LGT_" + new_name + "_000")
         except ValueError as e:
             self.info_timer(f"Error: Wrong input - {e}")
         self.refresh(light_table)
@@ -78,8 +78,7 @@ class MayaLightLogic(QObject):
                     node_type = m.nodeType(lightshape)
                     transform = m.listRelatives(lightshape, parent=True)[0]
                     if node_type in self.lightTypes:
-                        self.light_name_to_list(
-                            lightshape, transform, light_table)
+                        self.light_name_to_list(lightshape, transform, light_table)
                         self.mute_solo_to_list(transform, light_table)
                         self.color_button_to_list(transform, light_table)
                         self.entry_attr_num_to_list(transform, "aiExposure", 5, light_table)
@@ -164,8 +163,7 @@ class MayaLightLogic(QObject):
             self.info_timer(f"Failed to create light: {naming_convention}")
             return
 
-        light_shape_nodes = m.listRelatives(
-            light_transform, shapes=True, fullPath=True)
+        light_shape_nodes = m.listRelatives(light_transform, shapes=True, fullPath=True)
 
         if not light_shape_nodes:
             self.info_timer(f"Could not find shape node for {light_name}")
@@ -304,6 +302,7 @@ class MayaLightLogic(QObject):
                     bar_text.setText(f"{current_maya_val:.3f}")
                 elif isinstance(current_maya_val, (int)):
                     bar_text.setText(f"{current_maya_val}")
+
         bar_text.returnPressed.connect(_update_maya_from_ui)
 
         def _update_ui_from_maya(*args: str):
@@ -348,14 +347,14 @@ class MayaLightLogic(QObject):
         def _update_maya_from_ui():
             new_value = bar_text.text()
             try:
-                m.setAttr(full_attr_name, new_value, type='string')
-                self.info_timer(
-                    text=f"{light_shape_name.split('.')[0].split('|')[2]} set AOV: '{new_value}'")
+                m.setAttr(full_attr_name, new_value, type="string")
+                self.info_timer(text=f"{light_shape_name.split('.')[0].split('|')[2]} set AOV: '{new_value}'")
             except (ValueError, RuntimeError) as e:
                 self.info_timer(f"Invalid input : {e}")
                 # ON ERROR, Reset the text to the current value in MAYA
                 current_maya_val = m.getAttr(full_attr_name)
                 bar_text.setText(current_maya_val)
+
         bar_text.returnPressed.connect(_update_maya_from_ui)
 
         def _update_ui_from_maya(*args: str):
@@ -394,7 +393,7 @@ class MayaLightLogic(QObject):
                     if solo_widget:
                         # RETRIEVE THE CUSTOM WIDGET IN THE  'Solo' COLUMN
                         solo_checkbox = solo_widget.findChild(QCheckBox)
-                        if solo_checkbox and solo_checkbox.isChecked():     # PREVENT RECURSIVE CALLS OF THIS FUNCTION
+                        if (solo_checkbox and solo_checkbox.isChecked()):  # PREVENT RECURSIVE CALLS OF THIS FUNCTION
                             solo_checkbox.blockSignals(True)
                             # UNCHECKED THE PREVIOUS SOLOED CHECKBOX
                             solo_checkbox.setChecked(False)
@@ -461,7 +460,7 @@ class MayaLightLogic(QObject):
         # OPEN MAYA COLOR EDITOR
         color = m.colorEditor(rgbValue=lightColor)
         r, g, b, a = [float(c) for c in color.split()]  # RGB in string values
-        m.setAttr(light_name + ".color", r, g, b,type="double3")  # SET THE COLOR IN MAYA
+        m.setAttr(light_name + ".color", r, g, b, type="double3")  # SET THE COLOR IN MAYA
         self.set_button_color(light_name, color_button, (r, g, b))
 
     def set_button_color(self, light_name: int, color_button: QPushButton, color: tuple = None):
@@ -506,7 +505,7 @@ class MayaLightLogic(QObject):
                     args[1].hideRow(row)
 
     def render(self):
-        """ Sets the current renderer to Arnold and opens the Arnold Render View. """
+        """Sets the current renderer to Arnold and opens the Arnold Render View."""
 
         m.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
         m.arnoldRenderView(mode="open")
