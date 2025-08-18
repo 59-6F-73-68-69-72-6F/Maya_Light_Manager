@@ -12,7 +12,7 @@ directory = r"YOUR_PATH\Maya_Light_Manager"
 if directory not in sys.path:
     sys.path.append(directory)
 
-import main
-reload(main)
-main
+import mlm_main
+reload(mlm_main)
+mlm_main
 print("Launched Maya Light Manager.")
