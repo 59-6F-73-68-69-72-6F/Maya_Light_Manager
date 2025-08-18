@@ -461,7 +461,7 @@ class MayaLightLogic(QObject):
         # OPEN MAYA COLOR EDITOR
         color = m.colorEditor(rgbValue=lightColor)
         r, g, b, a = [float(c) for c in color.split()]  # RGB in string values
-        m.setAttr(light_name + ".color", r, g, b,type="double3")  # SET THE COLOR IN MAYA
+        m.setAttr(light_name + ".color", r, g, b, type="double3")  # SET THE COLOR IN MAYA
         self.set_button_color(light_name, color_button, (r, g, b))
 
     def set_button_color(self, light_name: int, color_button: QPushButton, color: tuple = None):
