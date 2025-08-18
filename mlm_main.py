@@ -20,14 +20,15 @@ import os
 from Qt.QtGui import QPixmap
 
 import maya.cmds as m
-    
+
 import LightManagerUI as lmui
 import MayaLightLogic as mll
 
 logic = None
 ui = None
 
-def getMayaMainWindow()-> lmui.LightManagerUI:
+
+def getMayaMainWindow() -> lmui.LightManagerUI:
     """
     Initializes and launches the Maya Light Manager UI.
 
@@ -42,27 +43,30 @@ def getMayaMainWindow()-> lmui.LightManagerUI:
        current Maya scene.
     5. Displays the UI window.
     """
-    global ui,logic
-    
+    global ui, logic
+
     ui = lmui.LightManagerUI()
     logic = mll.MayaLightLogic(ui)
-    
+
     # LOAD LOGO IMAGE
-    script_path = os.path.dirname(os.path.abspath(__file__))  # GET THE PATH OF THE CURRENT SCRIPT
+    # GET THE PATH OF THE CURRENT SCRIPT
+    script_path = os.path.dirname(os.path.abspath(__file__))
     logo_path = os.path.join(script_path, "img", "logo.png")
     img = QPixmap(logo_path)
     ui.logo.setPixmap(img)
-    
+
     # SET SIGNALS
-    ui.signal_table_selection.connect(logic.lightTable_selection)
+    ui.signal_table_selection.connect(logic.light_table_selection)
     ui.signal_lightCreated.connect(logic.create_light)
     ui.signal_lightRenamed.connect(logic.rename_light)
-    ui.signal_lightSearch.connect(logic.searchLight)
-    ui.button_render.clicked.connect(logic.render) 
+    ui.signal_lightSearch.connect(logic.search_light)
+    ui.button_render.clicked.connect(logic.render)
     ui.signal_lightDeleted.connect(logic.delete)
     ui.signal_refresh.connect(logic.refresh)
-    logic.refresh(ui.lightTable)  # INITIAL REFRESH TO LOAD LIGHTS
-    
+    logic.refresh(ui.light_table)  # INITIAL REFRESH TO LOAD LIGHTS
+
     ui.show()
     return ui
+
+
 getMayaMainWindow()
