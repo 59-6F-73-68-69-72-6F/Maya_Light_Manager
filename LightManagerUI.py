@@ -267,7 +267,7 @@ class CustomLineEditNum(QLineEdit):
         super().__init__()
         self.setText("0.000") 
 
-    def wheel_event(self, event: QWheelEvent):
+    def wheelEvent(self, event: QWheelEvent):
         """
         Handles the wheel event to increment or decrement the QLineEdit's numerical value.
         - Ctrl + Scroll: Adjusts the value by 0.01
@@ -281,7 +281,7 @@ class CustomLineEditNum(QLineEdit):
         elif modifiers ==   Qt.ShiftModifier:
             step = 0.001
         else:
-            super().wheel_event(event)
+            super().wheelEvent(event)
             return
         
         try:
