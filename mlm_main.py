@@ -15,8 +15,9 @@
 # . CLEAR AND EASY SAMPLES MANAGMENT
 ######################################################
 
-from Qt.QtGui import QPixmap
 import os
+
+from Qt.QtGui import QPixmap
 
 import maya.cmds as m
     
