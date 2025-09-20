@@ -48,3 +48,11 @@
    * Autodesk Maya: Designed for modern versions of Maya.
    * Arnold Renderer: Optimized for workflows using the Arnold renderer, with full support for Arnold-specific lights and attributes.
    * Standard Lights: Maintains full compatibility with Maya's standard lights.
+
+  <h2 style="color: #48C9B0;">Dependency</h2>
+
+  * <code>Qt.py </code> 
+  
+  Needs to be placed by default in:
+  
+  <code>C:\Users\YOURSELF\Documents\maya\VERSION\scripts</code>
