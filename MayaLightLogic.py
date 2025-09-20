@@ -308,7 +308,7 @@ class MayaLightLogic(QObject):
                     bar_text.setText(f"{current_maya_val}")
         bar_text.returnPressed.connect(_update_maya_from_ui)
 
-        def _update_ui_from_maya(*args: str):
+        def _update_ui_from_maya(*_: str):
             if not m.objExists(light_transform_name):
                 return
             # AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
@@ -360,7 +360,7 @@ class MayaLightLogic(QObject):
                 bar_text.setText(current_maya_val)
         bar_text.returnPressed.connect(_update_maya_from_ui)
 
-        def _update_ui_from_maya(*args: str):
+        def _update_ui_from_maya(*_: str):
             if not m.objExists(light_shape_name):
                 return
             # AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA

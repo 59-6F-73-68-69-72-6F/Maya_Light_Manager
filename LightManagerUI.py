@@ -33,15 +33,15 @@ class LightManagerUI(QWidget):
     """
 
     # (light_name, light_type, table_widget)
-    signal_lightCreated = Signal(str, str, object)
+    signal_light_created = Signal(str, str, object)
     # (old_name, new_name,table_widget)
-    signal_lightRenamed = Signal(str, str, object)
-    signal_lightSearch = Signal(str, object)  # (search_text, table_widget)
+    signal_light_renamed = Signal(str, str, object)
+    signal_light_search = Signal(str, object)  # (search_text, table_widget)
     signal_table_selection = Signal(object)  # (table_widget)
-    signal_lightDeleted = Signal(object)  # (table_widget)
+    signal_light_deleted = Signal(object)  # (table_widget)
     signal_refresh = Signal(object)  # (table_widget)
 
-    lightTypes = [
+    LIGHT_TYPES = [
         "aiPhotometricLight",
         "aiSkyDomeLight",
         "aiAreaLight",
@@ -83,7 +83,7 @@ class LightManagerUI(QWidget):
 
         title_light_type = self.label_text("Light Type:")
         self.combo_light_type = self.combo_list(
-            self.lightTypes)  # COMBO BOX DRIVEN BY DICT
+            self.LIGHT_TYPES)  # COMBO BOX DRIVEN BY DICT
 
         self.button_create_light = self.push_button("Create Light")
         self.button_create_light.setStyleSheet(" background-color: #2a9d8f ; color: black;")
@@ -207,39 +207,56 @@ class LightManagerUI(QWidget):
         Connects UI widget signals (e.g., button clicks) to their
         corresponding emitter methods in this class.
         """
-        self.button_create_light.clicked.connect(self.emit_lightCreated)
-        self.button_rename.clicked.connect(self.emit_lightRenamed)
+        self.button_create_light.clicked.connect(self.emit_light_created)
+        self.button_rename.clicked.connect(self.emit_light_renamed)
         self.button_refresh.clicked.connect(self.emit_refresh)
+<<<<<<< HEAD
         self.button_delete.clicked.connect(self.emit_lightDeleted)
         self.light_table.itemSelectionChanged.connect(self.emit_table_selection)
         self.entry_ligh_search.textChanged.connect(self.emit_lightSearch)
+=======
+        self.button_delete.clicked.connect(self.emit_light_deleted)
+        self.light_table.itemSelectionChanged.connect(
+            self.emit_table_selection)
+        self.entry_ligh_search.textChanged.connect(self.emit_light_search)
+>>>>>>> ed92a679e6ac710ec8fb0b78d253237a0bb4914c
 
     # EMITTERS --------------------------------------
-    def emit_lightCreated(self):
+    def emit_light_created(self):
         """
-        Gathers light name and type from the UI and emits the `signal_lightCreated`.
+        Gathers light name and type from the UI and emits the `signal_light_created`.
         Clears the light name field.
         """
         self.light_name = self.entry_light_name.text()
         self.light_type = self.combo_light_type.currentText()
+<<<<<<< HEAD
         self.signal_lightCreated.emit(self.light_name, self.light_type, self.light_table)
+=======
+        self.signal_light_created.emit(
+            self.light_name, self.light_type, self.light_table)
+>>>>>>> ed92a679e6ac710ec8fb0b78d253237a0bb4914c
         self.entry_light_name.clear()
 
-    def emit_lightRenamed(self):
+    def emit_light_renamed(self):
         """
         Gathers the old name from the table selection and the new name
-        from the input field, then emits the `signal_lightRenamed`.
+        from the input field, then emits the `signal_light_renamed`.
         Clears the light name field.
         """
         if self.light_table.selectedItems():
             self.old_name = self.light_table.currentItem().text()
             self.new_name = self.entry_light_name.text()
+<<<<<<< HEAD
             self.signal_lightRenamed.emit(self.old_name, self.new_name, self.light_table)
+=======
+            self.signal_light_renamed.emit(
+                self.old_name, self.new_name, self.light_table)
+>>>>>>> ed92a679e6ac710ec8fb0b78d253237a0bb4914c
             self.entry_light_name.clear()
 
-    def emit_lightDeleted(self):
+    def emit_light_deleted(self):
         """
-        Confirms with the user and then emits the `signal_lightDeleted`
+        Confirms with the user and then emits the `signal_light_deleted`
         for the currently selected light.
         """
         if self.light_table.selectedItems():
@@ -247,17 +264,17 @@ class LightManagerUI(QWidget):
             btn_question = QMessageBox.question(
                 self, "Question", f"Are you sure you want to delete {selection} ?")
             if btn_question == QMessageBox.Yes:
-                self.signal_lightDeleted.emit(self.light_table)
+                self.signal_light_deleted.emit(self.light_table)
             else:
                 pass
 
-    def emit_lightSearch(self):
+    def emit_light_search(self):
         """
         Gathers the search text from the input field and emits the
-        `signal_lightSearch`.
+        `signal_light_search`.
         """
         search_text = self.entry_ligh_search.text()
-        self.signal_lightSearch.emit(search_text, self.light_table)
+        self.signal_light_search.emit(search_text, self.light_table)
 
     def emit_table_selection(self):
         """ Emits the `signal_table_selection` when the table selection changes. """
