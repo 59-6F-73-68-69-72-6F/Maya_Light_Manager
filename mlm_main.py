@@ -19,8 +19,6 @@ import os
 
 from Qt.QtGui import QPixmap
 
-import maya.cmds as m
-
 import LightManagerUI as lmui
 import MayaLightLogic as mll
 
@@ -66,7 +64,6 @@ def getMayaMainWindow() -> lmui.LightManagerUI:
     logic.refresh(ui.light_table)  # INITIAL REFRESH TO LOAD LIGHTS
 
     ui.show()
-    return ui
 
 
 getMayaMainWindow()

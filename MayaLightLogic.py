@@ -74,9 +74,11 @@ class MayaLightLogic(QObject):
         all_lights = [m.ls(type=Ltype) for Ltype in self.lightTypes]
         for shapes in all_lights:
             if shapes:
+
                 for lightshape in shapes:
                     node_type = m.nodeType(lightshape)
                     transform = m.listRelatives(lightshape, parent=True)[0]
+
                     if node_type in self.lightTypes:
                         self.light_name_to_list(
                             lightshape, transform, light_table)
@@ -88,7 +90,6 @@ class MayaLightLogic(QObject):
                         self.info_timer("Light Manager refreshed successfully.")
                     else:
                         self.info_timer(f"'{transform}' is not allowed by the manager - warning {node_type}")
-                        pass
         m.select(clear=True)
 
     def delete(self, light_table: object):
@@ -116,12 +117,13 @@ class MayaLightLogic(QObject):
         if selected_items:
             row = selected_items[0].row()
             light_name_item = lightTable.item(row, 0)
+
             if light_name_item:
                 light_name = light_name_item.text()
                 m.select(clear=True)
                 try:
                     m.select(light_name)
-                except ValueError as e:
+                except ValueError:
                     self.info_timer(f"Error:  '{light_name}' None Existent")
         else:
             m.select(clear=True)
@@ -140,7 +142,7 @@ class MayaLightLogic(QObject):
         """
         if light_type not in self.lightTypes:
             self.info_timer(f"Error: Light type '{light_type}' is invalid or not selected in the ComboBox.")
-            return None
+            return
         lightType_key = light_type
         # PREBUILD MAYA LIGHT CREATION  COMMAND LINE
         func = self.lightTypes[lightType_key]

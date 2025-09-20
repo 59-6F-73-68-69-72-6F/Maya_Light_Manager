@@ -3,7 +3,6 @@ from Qt.QtGui import QFont, QWheelEvent
 from Qt.QtWidgets import (QWidget, QTableWidget, QComboBox, QLabel, QLineEdit, QPushButton,
                           QVBoxLayout, QHBoxLayout, QAbstractItemView, QGroupBox, QApplication, QMessageBox)
 
-from maya import cmds as m
 
 TABLE_HEADER = ["Name", "M", "S", "Light",
                 "Color", "Exposure", "Samples", "AOV"]
@@ -111,6 +110,7 @@ class LightManagerUI(QWidget):
         self.light_table.setEditTriggers(
             QAbstractItemView.NoEditTriggers)  # MAKE CELLS NON-EDITABLE
         self.light_table.setStyleSheet("QTableWidget { background-color: #222b33 ; color: white; }")
+
         for y in range(len(TABLE_HEADER)):
             self.light_table.setColumnCount(y+1)
             self.light_table.setHorizontalHeaderLabels(
@@ -211,8 +211,7 @@ class LightManagerUI(QWidget):
         self.button_rename.clicked.connect(self.emit_lightRenamed)
         self.button_refresh.clicked.connect(self.emit_refresh)
         self.button_delete.clicked.connect(self.emit_lightDeleted)
-        self.light_table.itemSelectionChanged.connect(
-            self.emit_table_selection)
+        self.light_table.itemSelectionChanged.connect(self.emit_table_selection)
         self.entry_ligh_search.textChanged.connect(self.emit_lightSearch)
 
     # EMITTERS --------------------------------------
@@ -223,8 +222,7 @@ class LightManagerUI(QWidget):
         """
         self.light_name = self.entry_light_name.text()
         self.light_type = self.combo_light_type.currentText()
-        self.signal_lightCreated.emit(
-            self.light_name, self.light_type, self.light_table)
+        self.signal_lightCreated.emit(self.light_name, self.light_type, self.light_table)
         self.entry_light_name.clear()
 
     def emit_lightRenamed(self):
@@ -236,8 +234,7 @@ class LightManagerUI(QWidget):
         if self.light_table.selectedItems():
             self.old_name = self.light_table.currentItem().text()
             self.new_name = self.entry_light_name.text()
-            self.signal_lightRenamed.emit(
-                self.old_name, self.new_name, self.light_table)
+            self.signal_lightRenamed.emit(self.old_name, self.new_name, self.light_table)
             self.entry_light_name.clear()
 
     def emit_lightDeleted(self):
