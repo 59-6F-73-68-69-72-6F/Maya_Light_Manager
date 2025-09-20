@@ -32,10 +32,8 @@ class LightManagerUI(QWidget):
     commands.
     """
 
-    # (light_name, light_type, table_widget)
-    signal_light_created = Signal(str, str, object)
-    # (old_name, new_name,table_widget)
-    signal_light_renamed = Signal(str, str, object)
+    signal_light_created = Signal(str, str, object)  # (light_name, light_type, table_widget)
+    signal_light_renamed = Signal(str, str, object)  # (old_name, new_name,table_widget)
     signal_light_search = Signal(str, object)  # (search_text, table_widget)
     signal_table_selection = Signal(object)  # (table_widget)
     signal_light_deleted = Signal(object)  # (table_widget)
