@@ -63,8 +63,7 @@ class LightManagerUI(QWidget):
         This includes setting up the window properties, creating buttons,
         input fields, the main table, and organizing them into layouts.
         """
-        self.setWindowFlags(self.windowFlags() |
-                            Qt.WindowStaysOnTopHint)  # KEEP WINDOW ON TOP
+        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)  # KEEP WINDOW ON TOP
         self.setWindowTitle("Maya Light Manager")
         self.setMinimumSize(620, 690)
         self.setMaximumSize(620, 1000)
@@ -210,16 +209,9 @@ class LightManagerUI(QWidget):
         self.button_create_light.clicked.connect(self.emit_light_created)
         self.button_rename.clicked.connect(self.emit_light_renamed)
         self.button_refresh.clicked.connect(self.emit_refresh)
-<<<<<<< HEAD
-        self.button_delete.clicked.connect(self.emit_lightDeleted)
-        self.light_table.itemSelectionChanged.connect(self.emit_table_selection)
-        self.entry_ligh_search.textChanged.connect(self.emit_lightSearch)
-=======
         self.button_delete.clicked.connect(self.emit_light_deleted)
-        self.light_table.itemSelectionChanged.connect(
-            self.emit_table_selection)
+        self.light_table.itemSelectionChanged.connect(self.emit_table_selection)
         self.entry_ligh_search.textChanged.connect(self.emit_light_search)
->>>>>>> ed92a679e6ac710ec8fb0b78d253237a0bb4914c
 
     # EMITTERS --------------------------------------
     def emit_light_created(self):
@@ -229,12 +221,7 @@ class LightManagerUI(QWidget):
         """
         self.light_name = self.entry_light_name.text()
         self.light_type = self.combo_light_type.currentText()
-<<<<<<< HEAD
-        self.signal_lightCreated.emit(self.light_name, self.light_type, self.light_table)
-=======
-        self.signal_light_created.emit(
-            self.light_name, self.light_type, self.light_table)
->>>>>>> ed92a679e6ac710ec8fb0b78d253237a0bb4914c
+        self.signal_light_created.emit(self.light_name, self.light_type, self.light_table)
         self.entry_light_name.clear()
 
     def emit_light_renamed(self):
@@ -246,12 +233,8 @@ class LightManagerUI(QWidget):
         if self.light_table.selectedItems():
             self.old_name = self.light_table.currentItem().text()
             self.new_name = self.entry_light_name.text()
-<<<<<<< HEAD
-            self.signal_lightRenamed.emit(self.old_name, self.new_name, self.light_table)
-=======
             self.signal_light_renamed.emit(
                 self.old_name, self.new_name, self.light_table)
->>>>>>> ed92a679e6ac710ec8fb0b78d253237a0bb4914c
             self.entry_light_name.clear()
 
     def emit_light_deleted(self):
@@ -316,7 +299,4 @@ class CustomLineEditNum(QLineEdit):
         current_value = float(self.text())
         delta = event.angleDelta().y() / 120
         new_value = current_value + delta * step
-        try:
-            self.setText(f"{new_value:.3f}")
-        except ValueError:
-            pass
+        self.setText(f"{new_value:.3f}")
