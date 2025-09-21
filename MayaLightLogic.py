@@ -6,7 +6,7 @@ from Qt.QtCore import Qt, QTimer, QObject
 from Qt.QtGui import QPixmap
 
 import mtoa.utils as au
-import maya.cmds as m
+import maya.cmds as cmds
 
 from LightManagerUI import CustomLineEditNum
 
@@ -29,9 +29,9 @@ class MayaLightLogic(QObject):
             "aiPhotometricLight": None,
             "aiSkyDomeLight": None,
             "aiAreaLight": None,
-            "spotLight": m.spotLight,
-            "pointLight": m.pointLight,
-            "directionalLight": m.directionalLight,
+            "spotLight": cmds.spotLight,
+            "pointLight": cmds.pointLight,
+            "directionalLight": cmds.directionalLight,
         }
 
     def rename_light(self, old_name: str, new_name: str, light_table: object):
@@ -45,7 +45,7 @@ class MayaLightLogic(QObject):
         """
         try:
             # RENAME WITH A NANING CONVENTION
-            m.rename(old_name, "LGT_"+new_name+"_000")
+            cmds.rename(old_name, "LGT_"+new_name+"_000")
         except ValueError as e:
             self.info_timer(f"Error: Wrong input - {e}")
         self.refresh(light_table)
@@ -65,19 +65,19 @@ class MayaLightLogic(QObject):
         """
         # KILL ALL EXISTING SCRIPTS JOB TO PREVENT ERRORS WITH DELETED WIDGETS
         for job_id in self.script_jobs:
-            if m.scriptJob(exists=job_id):
-                m.scriptJob(kill=job_id, force=True)
+            if cmds.scriptJob(exists=job_id):
+                cmds.scriptJob(kill=job_id, force=True)
         self.script_jobs.clear()
         light_table.setRowCount(0)  # CLEAR EXISTING ROWS
 
         # REPOPULATE THE TABLE
-        all_lights = [m.ls(type=Ltype) for Ltype in self.lightTypes]
+        all_lights = [cmds.ls(type=Ltype) for Ltype in self.lightTypes]
         for shapes in all_lights:
             if shapes:
 
                 for lightshape in shapes:
-                    node_type = m.nodeType(lightshape)
-                    transform = m.listRelatives(lightshape, parent=True)[0]
+                    node_type = cmds.nodeType(lightshape)
+                    transform = cmds.listRelatives(lightshape, parent=True)[0]
 
                     if node_type in self.lightTypes:
                         self.light_name_to_list(
@@ -90,7 +90,7 @@ class MayaLightLogic(QObject):
                         self.info_timer("Light Manager refreshed successfully.")
                     else:
                         self.info_timer(f"'{transform}' is not allowed by the manager - warning {node_type}")
-        m.select(clear=True)
+        cmds.select(clear=True)
 
     def delete(self, light_table: object):
         """
@@ -98,8 +98,8 @@ class MayaLightLogic(QObject):
         Args:
             light_table (QTableWidget): The table widget to refresh after deletion.
         """
-        selection = m.ls(selection=True, dagObjects=True)
-        m.delete(selection)
+        selection = cmds.ls(selection=True, dagObjects=True)
+        cmds.delete(selection)
         self.refresh(light_table)
         self.info_timer(f"Light  '{selection[0]}' deleted successfully.")
 
@@ -120,13 +120,13 @@ class MayaLightLogic(QObject):
 
             if light_name_item:
                 light_name = light_name_item.text()
-                m.select(clear=True)
+                cmds.select(clear=True)
                 try:
-                    m.select(light_name)
+                    cmds.select(light_name)
                 except ValueError:
                     self.info_timer(f"Error:  '{light_name}' None Existent")
         else:
-            m.select(clear=True)
+            cmds.select(clear=True)
 
     def create_light(self, light_name: str, light_type: str, light_table: object):
         """
@@ -156,17 +156,17 @@ class MayaLightLogic(QObject):
         # ARNOLD LIGHT
         if lightType_key in ["aiAreaLight", "aiSkyDomeLight", "aiPhotometricLight"]:
             light_nodes = au.createLocator(lightType_key, asLight=True)
-            light_transform = m.rename(light_nodes[1], naming_convention)
+            light_transform = cmds.rename(light_nodes[1], naming_convention)
         else:
             # MAYALIGHT
             light_shape = func(name=naming_convention)
-            light_transform = m.ls(selection=True, long=True)[0][1:]
+            light_transform = cmds.ls(selection=True, long=True)[0][1:]
 
-        if not light_transform or not m.objExists(light_transform):
+        if not light_transform or not cmds.objExists(light_transform):
             self.info_timer(f"Failed to create light: {naming_convention}")
             return
 
-        light_shape_nodes = m.listRelatives(
+        light_shape_nodes = cmds.listRelatives(
             light_transform, shapes=True, fullPath=True)
 
         if not light_shape_nodes:
@@ -203,7 +203,7 @@ class MayaLightLogic(QObject):
         light_table.setItem(self.row_position, 0, name_item)
 
         # POPULATE THE "Light Type" COLUMN
-        light_type = m.nodeType(light_shape_name)
+        light_type = cmds.nodeType(light_shape_name)
         icon_light_type = QLabel()
 
         if light_type in ["aiAreaLight", "aiSkyDomeLight", "aiPhotometricLight"]:
@@ -228,7 +228,7 @@ class MayaLightLogic(QObject):
         mute_widget = QWidget()
         mute_checkbox = QCheckBox()
         mute_checkbox.setStyleSheet("QCheckBox::indicator:unchecked { background-color: #f94144 }")
-        current_visibility = m.getAttr(f"{light_transform_name}.visibility")
+        current_visibility = cmds.getAttr(f"{light_transform_name}.visibility")
         mute_checkbox.setChecked(bool(current_visibility))
         mute_checkbox.stateChanged.connect(partial(self.update_all_lights_visibility, light_table))
         mute_layout = QHBoxLayout(mute_widget)
@@ -281,7 +281,7 @@ class MayaLightLogic(QObject):
             light_table (QTableWidget): The table to add the widget to.
         """
         full_attr_name = f"{light_transform_name}.{attribute_name}"
-        current_value = m.getAttr(full_attr_name)
+        current_value = cmds.getAttr(full_attr_name)
         # SETTING THE CURRENT VALUE IN THE UI
         bar_text = CustomLineEditNum()
         if isinstance(current_value, (float)):
@@ -297,11 +297,11 @@ class MayaLightLogic(QObject):
             try:
                 # SET VALUE IN MAYA
                 new_value = float(bar_text.text())
-                m.setAttr(full_attr_name, new_value)
+                cmds.setAttr(full_attr_name, new_value)
             except (ValueError, RuntimeError) as e:
                 self.info_timer(f"Wrong input:  Please enter a number")
                 # ON ERROR, Reset the text to the current value in MAYA
-                current_maya_val = m.getAttr(full_attr_name)
+                current_maya_val = cmds.getAttr(full_attr_name)
                 if isinstance(current_maya_val, (float)):
                     bar_text.setText(f"{current_maya_val:.3f}")
                 elif isinstance(current_maya_val, (int)):
@@ -309,11 +309,11 @@ class MayaLightLogic(QObject):
         bar_text.returnPressed.connect(_update_maya_from_ui)
 
         def _update_ui_from_maya(*_: str):
-            if not m.objExists(light_transform_name):
+            if not cmds.objExists(light_transform_name):
                 return
             # AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
             bar_text.blockSignals(True)
-            new_value = m.getAttr(full_attr_name)
+            new_value = cmds.getAttr(full_attr_name)
             try:
                 if isinstance(new_value, (float)):
                     bar_text.setText(f"{new_value:.3f}")
@@ -324,7 +324,7 @@ class MayaLightLogic(QObject):
                 bar_text.blockSignals(False)
 
         # CREATE A SCRIPT JOB TO LISTEN FOR CHANGES AND STORE ID FOR CLEANUP
-        job_id = m.scriptJob(attributeChange=[full_attr_name, _update_ui_from_maya])
+        job_id = cmds.scriptJob(attributeChange=[full_attr_name, _update_ui_from_maya])
         self.script_jobs.append(job_id)
         light_table.setCellWidget(self.row_position, column, bar_text)
 
@@ -341,7 +341,7 @@ class MayaLightLogic(QObject):
             light_table (QTableWidget): The table to add the widget to.
         """
         full_attr_name = f"{light_shape_name}"
-        current_value = m.getAttr(full_attr_name)
+        current_value = cmds.getAttr(full_attr_name)
         bar_text = QLineEdit(placeholderText=current_value)
         bar_text.setFixedSize(59, 29)
         bar_text.setAlignment(Qt.AlignCenter)
@@ -350,29 +350,29 @@ class MayaLightLogic(QObject):
         def _update_maya_from_ui():
             new_value = bar_text.text()
             try:
-                m.setAttr(full_attr_name, new_value, type='string')
+                cmds.setAttr(full_attr_name, new_value, type='string')
                 self.info_timer(
                     text=f"{light_shape_name.split('.')[0].split('|')[2]} set AOV: '{new_value}'")
             except (ValueError, RuntimeError) as e:
                 self.info_timer(f"Invalid input : {e}")
                 # ON ERROR, Reset the text to the current value in MAYA
-                current_maya_val = m.getAttr(full_attr_name)
+                current_maya_val = cmds.getAttr(full_attr_name)
                 bar_text.setText(current_maya_val)
         bar_text.returnPressed.connect(_update_maya_from_ui)
 
         def _update_ui_from_maya(*_: str):
-            if not m.objExists(light_shape_name):
+            if not cmds.objExists(light_shape_name):
                 return
             # AVOIDING AN INFINITE LOOP BETWEEN THE UI AND MAYA
             bar_text.blockSignals(True)
-            new_value = m.getAttr(full_attr_name)
+            new_value = cmds.getAttr(full_attr_name)
             try:
                 bar_text.setText(new_value)
             finally:
                 bar_text.blockSignals(False)
 
         # CREATE A SCRIPT JOB TO LISTEN FOR CHANGES AND STORE ID FOR CLEANUP
-        job_id = m.scriptJob(attributeChange=[full_attr_name, _update_ui_from_maya])
+        job_id = cmds.scriptJob(attributeChange=[full_attr_name, _update_ui_from_maya])
         self.script_jobs.append(job_id)
         light_table.setCellWidget(self.row_position, column, bar_text)
 
@@ -437,14 +437,14 @@ class MayaLightLogic(QObject):
                 continue
 
             light_name = light_name_item.text()
-            if not m.objExists(light_name):
+            if not cmds.objExists(light_name):
                 continue
             mute_checkbox = mute_widget.findChild(QCheckBox)
 
-            if m.objExists(light_name) and mute_checkbox:
+            if cmds.objExists(light_name) and mute_checkbox:
                 is_visible = (i == soloed_row) if soloed_row != -1 else mute_checkbox.isChecked()
                 # SET THE VISIBILITY OF THE CORRESPONDING LIGHT IN MAYA.
-                m.setAttr(f"{light_name}.visibility", is_visible)
+                cmds.setAttr(f"{light_name}.visibility", is_visible)
 
     def set_color(self, light_name: str, color_button: QPushButton):
         """
@@ -454,16 +454,16 @@ class MayaLightLogic(QObject):
             light_name (str): The name of the light to modify.
             color_button (QPushButton): The button in the UI whose color will be updated.
         """
-        if not isinstance(light_name, str) or not m.objExists(light_name):
+        if not isinstance(light_name, str) or not cmds.objExists(light_name):
             self.info_timer(f"Error: Light '{light_name}' does not exist or is invalid.")
             return
 
         # GET THE ACTUAL LIGHT COLOR
-        lightColor = m.getAttr(light_name + ".color")[0]
+        lightColor = cmds.getAttr(light_name + ".color")[0]
         # OPEN MAYA COLOR EDITOR
-        color = m.colorEditor(rgbValue=lightColor)
+        color = cmds.colorEditor(rgbValue=lightColor)
         r, g, b, a = [float(c) for c in color.split()]  # RGB in string values
-        m.setAttr(light_name + ".color", r, g, b, type="double3")  # SET THE COLOR IN MAYA
+        cmds.setAttr(light_name + ".color", r, g, b, type="double3")  # SET THE COLOR IN MAYA
         self.set_button_color(light_name, color_button, (r, g, b))
 
     def set_button_color(self, light_name: int, color_button: QPushButton, color: tuple = None):
@@ -475,12 +475,12 @@ class MayaLightLogic(QObject):
             color_button (QPushButton): The UI button to update.
             color (tuple, optional): The RGB color to set. If None, it's fetched from Maya.
         """
-        if not isinstance(light_name, str) or not m.objExists(light_name):
+        if not isinstance(light_name, str) or not cmds.objExists(light_name):
             self.info_timer(f"Error:  '{light_name}' does not exist or is invalid.")
             return
 
         if not color:  # IF NOT, GET COLOR FROM MAYA
-            color = m.getAttr(light_name + ".color")[0]
+            color = cmds.getAttr(light_name + ".color")[0]
         if not isinstance(color, tuple):
             self.info_timer(f"Error:  Invalid color format for '{light_name}': {color}")
             return
@@ -510,8 +510,8 @@ class MayaLightLogic(QObject):
     def render(self):
         """ Sets the current renderer to Arnold and opens the Arnold Render View. """
 
-        m.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
-        m.arnoldRenderView(mode="open")
+        cmds.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
+        cmds.arnoldRenderView(mode="open")
 
     def info_timer(self, text: str, duration_ms: int = 3500):
         """
